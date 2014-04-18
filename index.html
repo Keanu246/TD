@@ -1,0 +1,31 @@
+<html>
+	<head>
+		<title>
+			TD
+		</title>
+		<style>
+	    canvas{
+	    	border:1px solid red;
+	    }
+		</style>
+		<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
+		<script type="text/javascript" src="scripts/bullet.js"></script>
+		<script type="text/javascript" src="scripts/renderer.js"></script>
+		<script>
+		var bullet = new Bullet(BulletType.Fire);
+		bullet.SetX(100);
+		$(function(){
+			var canvas = document.getElementById("drawing_canvas");
+			var renderer = new Renderer(canvas);
+			renderer.AddBullet(bullet);
+			var inter = setInterval(function(){
+				renderer.Draw();
+			},5);
+		});
+		</script>
+	</head>
+	<body>
+		<canvas id = "drawing_canvas" width=1200 height=640>			
+		</canvas>
+	</body>
+</html>
