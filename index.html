@@ -11,21 +11,31 @@
 		<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
 		<script type="text/javascript" src="scripts/bullet.js"></script>
 		<script type="text/javascript" src="scripts/renderer.js"></script>
+		<script type="text/javascript" src="scripts/block.js"></script>
 		<script>
 		var bullet = new Bullet(BulletType.Fire);
-		bullet.SetX(100);
+		bullet.SetCenterX(100);
+		bullet.SetCenterY(100);
+
 		$(function(){
 			var canvas = document.getElementById("drawing_canvas");
 			var renderer = new Renderer(canvas);
+			renderer.LoadMap("map1");
 			renderer.AddBullet(bullet);
+
 			var inter = setInterval(function(){
+				renderer.MoveObjects();
 				renderer.Draw();
 			},5);
 		});
+		document.addEventListener('mousemove', function(e){ 
+   			bullet.SetDirectionX((-1 * bullet.GetCenterX() + (e.clientX || e.pageX)) / 100);
+   			bullet.SetDirectionY((-1 * bullet.GetCenterY() + (e.clientY || e.pageY)) / 100);
+		}, false);
 		</script>
 	</head>
 	<body>
-		<canvas id = "drawing_canvas" width=1200 height=640>			
+		<canvas id = "drawing_canvas" width=1200 height=662>			
 		</canvas>
 	</body>
 </html>

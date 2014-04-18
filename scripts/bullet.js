@@ -6,10 +6,10 @@ var BulletType = {
 function Bullet(bulletType){
 
    // Add object properties like this
-   this.mX = 0.0;
-   this.mY = 0.0;
-   this.mSpeedX = 0.0;
-   this.mSpeedY = 0.0;
+   this.mCenterX = 0.0;
+   this.mCenterY = 0.0;
+   this.mDirectionX = -1.0;
+   this.mDirectionY = -1.0;
    this.mBulletType = bulletType;
    this.mBitmap = new Image();
    if (bulletType == BulletType.Metal) {
@@ -23,44 +23,46 @@ function Bullet(bulletType){
    }
 }
 
-Bullet.prototype.constructor = Bullet;
+Bullet.prototype.Constructor = Bullet;
 
-Bullet.prototype.SetX = function(x) {
-	this.mX = x;
+Bullet.prototype.SetCenterX = function(x) {
+	this.mCenterX = x;
 };
 
-Bullet.prototype.SetY = function(y) {
-	this.mY = y;
+Bullet.prototype.SetCenterY = function(y) {
+	this.mCenterY = y;
 };
 
-Bullet.prototype.GetX = function() {
-	return this.mX;
+Bullet.prototype.GetCenterX = function() {
+	return this.mCenterX;
 };
 
-Bullet.prototype.GetY = function() {
-	return this.mY;
+Bullet.prototype.GetCenterY = function() {
+	return this.mCenterY;
 };
 
-Bullet.prototype.GetSpeedX = function() {
-	return this.mSpeedX;
+Bullet.prototype.GetDirectionX = function() {
+	return this.mDirectionX;
 };
 
-Bullet.prototype.SetSpeedX = function(speedX) {
-	this.mSpeedX = speedX;
+Bullet.prototype.SetDirectionX = function(speedX) {
+	this.mDirectionX = speedX;
 };
 
-Bullet.prototype.GetSpeedY = function() {
-	return mSpeedY;
+Bullet.prototype.GetDirectionY = function() {
+	return this.mDirectionY;
 };
 
-Bullet.prototype.SetSpeedY = function(speedY) {
-	this.mSpeedY = speedY;
+Bullet.prototype.SetDirectionY = function(speedY) {
+	this.mDirectionY = speedY;
 }
 
-Bullet.prototype.Draw = function(context){
-	var angle = Math.atan2(this.mSpeedY , this.mSpeedX);
-	var centerX = this.mX + this.mWidth / 2;
-	var centerY = this.mY + this.mHeight / 2; 
-	context.drawImage(this.mBitmap,this.mX,this.mY , this.mWidth , this.mHeight);
+Bullet.prototype.Draw = function(context) {
+	var angle = Math.atan2(this.mDirectionX , -1 * this.mDirectionY);
+   context.translate(this.mCenterX , this.mCenterY); 
+   context.rotate(angle);
+	context.drawImage(this.mBitmap , -1 * this.mWidth / 2, -1 * this.mHeight / 2, this.mWidth , this.mHeight);
+   context.rotate(-1 * angle );
+   context.translate(-1 * this.mCenterX , -1 * this.mCenterY);
 }
 

@@ -25,6 +25,42 @@ Renderer.prototype.Draw = function() {
 	}
 };
 
+Renderer.prototype.MoveObjects = function() {
+	for (var index = 0; index < this.mBullets.length ; index++) {
+		this.mBullets[index].SetCenterX(this.mBullets[index].GetCenterX() + this.mBullets[index].GetDirectionX());
+		this.mBullets[index].SetCenterY(this.mBullets[index].GetCenterY() + this.mBullets[index].GetDirectionY());
+	}
+	for (var index = 0; index < this.mEnemies.length ; index++) {
+		this.mEnemies[index].SetCenterX(this.mEnemies[index].GetCenterX() + this.mEnemies[index].GetDirectionX());
+		this.mEnemies[index].SetCenterY(this.mEnemies[index].GetCenterY() + this.mEnemies[index].GetDirectionY());
+	}
+}
+
 Renderer.prototype.AddBullet = function(bullet) {
 	this.mBullets[this.mBullets.length] = bullet;
 };
+
+Renderer.prototype.LoadMap = function(mapFile) {
+	var request = new XMLHttpRequest(); 
+	request.open("GET","maps/" + mapFile + ".map",false); 
+	request.send(); 
+	var contents = request.responseText;
+
+	var row = 0, col = 0;
+
+	var tempBlocks = [];
+
+	for (var stringPos = 0; stringPos < contents.length; stringPos++) {
+		if (contents[stringPos] != '\n') {
+			var block = new Block(contents[stringPos] - '0' , 60 , 60);
+			block.SetCenterX(col * 60);
+			block.SetCenterY(row * 60);
+			tempBlocks[tempBlocks.length] = block;
+			col++;
+		} else {
+			row++;
+			col = 0;
+		}
+	}
+	this.mBlocks = tempBlocks;
+}
