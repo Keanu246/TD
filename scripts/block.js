@@ -8,7 +8,7 @@ function Block(blockType , width , height){
    // Add object properties like this
    this.mCenterX = 0.0;
    this.mCenterY = 0.0;
-   this.mBulletType = blockType;
+   this.mBlockType = blockType;
    this.mBitmap = new Image();
    if (blockType == BlockType.Dirt) {
    	this.mBitmap.src = "images/block-dirt.png";
@@ -37,8 +37,38 @@ Block.prototype.GetCenterY = function() {
 	return this.mCenterY;
 };
 
+Block.prototype.GetWidth = function() {
+	return this.mWidth;
+};
+
+Block.prototype.GetHeight = function() {
+	return this.mHeight;
+};
+
+Block.prototype.GetType = function() {
+	return this.mBlockType;
+};
+
 Block.prototype.Draw = function(context) {
 	context.translate(this.mCenterX , this.mCenterY); 
 	context.drawImage(this.mBitmap , -1 * this.mWidth / 2, -1 * this.mHeight / 2, this.mWidth , this.mHeight);
    	context.translate(-1 * this.mCenterX , -1 * this.mCenterY);   
+};
+
+Block.prototype.DrawSelector = function(context) {
+	if (this.mBlockType == BlockType.Road) {
+		context.fillStyle = "rgba(23, 209, 9, 0.5)";
+		context.strokeStyle = "green";
+	} else {
+		context.fillStyle = "rgba(222, 14, 14, 0.5)";
+		context.strokeStyle = "red";
+	}
+	context.fillRect(this.mCenterX - this.mWidth / 2 , this.mCenterY - this.mHeight / 2 , this.mWidth , this.mHeight);
+	context.strokeRect(this.mCenterX - this.mWidth / 2 , this.mCenterY - this.mHeight / 2 , this.mWidth , this.mHeight);
 }
+
+Block.prototype.CheckInside = function(x , y) {
+	var relativeX = this.mCenterX - x;
+	var relativeY = this.mCenterY - y;
+	return relativeX >= -1 * this.mWidth && relativeX < this.mHeight && relativeY >= -1 * this.mHeight && relativeY < this.mHeight;
+};

@@ -1,3 +1,5 @@
+var MAX_MILLISECONDS = 30;
+
 function Renderer(canvas) {
 	this.mCanvas = canvas;
 	this.mContext = canvas.getContext("2d");
@@ -5,15 +7,33 @@ function Renderer(canvas) {
 	this.mBlocks = [];
 	this.mTurrets = [];
 	this.mEnemies = [];
+	this.mMouseX = 0;
+	this.mMouseY = 0;
+}
+
+function sleep (milliseconds) {
+	if (milliseconds < 0) return;
+	var startTime = +new Date();
+	var currentTime = null;
+	do { 
+		currentTime = +new Date(); 
+	}
+	while(currentTime - startTime < milliseconds);
 }
 
 Renderer.prototype.Draw = function() {
 
+	var startTime = +new Date();
+	this.mContext.save();
 	this.mContext.clearRect(0 , 0 , this.mCanvas.width , this.mCanvas.height);
-
-	for (var index = 0; index < this.mBlocks.length ; index++) {
+	for (var index = 0, found = false; index < this.mBlocks.length ; index++) {
 		this.mBlocks[index].Draw(this.mContext);
+		if (!found && this.mBlocks[index].CheckInside(this.mMouseX , this.mMouseY)) {
+			this.mBlocks[index].DrawSelector(this.mContext);
+			found = true;
+		}
 	}
+
 	for (var index = 0; index < this.mBullets.length ; index++) {
 		this.mBullets[index].Draw(this.mContext);
 	}
@@ -23,6 +43,10 @@ Renderer.prototype.Draw = function() {
 	for (var index = 0; index < this.mEnemies.length ; index++) {
 		this.mEnemies[index].Draw(this.mContext);
 	}
+	this.mContext.restore();
+	var endTime = +new Date();
+	var duration = endTime - startTime;
+	sleep(30 - duration);
 };
 
 Renderer.prototype.MoveObjects = function() {
@@ -34,6 +58,15 @@ Renderer.prototype.MoveObjects = function() {
 		this.mEnemies[index].SetCenterX(this.mEnemies[index].GetCenterX() + this.mEnemies[index].GetDirectionX());
 		this.mEnemies[index].SetCenterY(this.mEnemies[index].GetCenterY() + this.mEnemies[index].GetDirectionY());
 	}
+}
+
+Renderer.prototype.SetMousePos = function(x , y) {
+	this.mMouseX = x;
+	this.mMouseY = y;
+}
+
+Renderer.prototype.CheckCollisions = function() {
+
 }
 
 Renderer.prototype.AddBullet = function(bullet) {
