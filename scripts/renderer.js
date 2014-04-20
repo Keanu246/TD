@@ -54,7 +54,7 @@ Array.prototype.Swap = function (pos1 , pos2) {
 	var x = this[pos1];
 	this[pos1] = this[pos2];
 	this[pos2] = x;
-}
+};
 
 Renderer.prototype.ManipulateObjects = function() {
 
@@ -125,7 +125,6 @@ Renderer.prototype.AddTurret = function(turretType , x , y) {
 			turret.SetCenterX(this.mBlocks[index].GetCenterX());
 			turret.SetCenterY(this.mBlocks[index].GetCenterY());
 			this.mTurrets[this.mTurrets.length] = turret;
-			this.mBullets[this.mBullets.length] = turret.MakeBullet();
 			found = true;
 		}
 	}

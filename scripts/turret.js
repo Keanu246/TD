@@ -1,5 +1,6 @@
 var TurretType = {
-	Basic:1
+	Basic:1,
+	Flamer:2,
 };
 
 function Turret (turretType , width , height) {
@@ -17,6 +18,12 @@ function Turret (turretType , width , height) {
    		this.mRange = 10;
    		this.mDamage = 5;
    		this.mAtckSpeed = 500; //milliseconds
+   	} else {
+   		this.mBulletType =	BulletType.Fire;
+   		this.mRange = 6;
+   		this.mDamage = 2;
+   		this.mAtckSpeed = 100;
+   		this.mBitmap.src = "images/basic-turret.png";
    	}
    	this.mLastShotted = 0;
 }

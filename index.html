@@ -20,8 +20,8 @@
 			var canvas = document.getElementById("drawing_canvas");
 			var renderer = new Renderer(canvas);
 			renderer.LoadMap("easy_map");
-			renderer.AddTurret(TurretType.Basic , 500 , 500);
-			renderer.AddTurret(TurretType.Basic , 800 , 400);
+			renderer.AddTurret(TurretType.Flamer , 500 , 500);
+			renderer.AddTurret(TurretType.Flamer , 800 , 400);
 			document.addEventListener('mousemove', function(e){ 
 	   			renderer.SetMousePos(e.clientX || e.pageX , e.clientY || e.pageY);
 			}, false);

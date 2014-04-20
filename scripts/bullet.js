@@ -18,11 +18,13 @@ function Bullet(bulletType){
       this.mWidth = 8.5;
       this.mHeight = 30;
       this.mSpeed = 12.0;
+      this.mRange = 17.0;
    } else if (bulletType == BulletType.Fire) {
       this.mBitmap.src = "images/fire-bullet.png";
-      this.mWidth = 15;
+      this.mWidth = 30;
       this.mHeight = 30;
-      this.mSpeed = 21.0;
+      this.mSpeed = 10.0;
+      this.mRange = 10.0;
    }
 }
 
@@ -56,6 +58,10 @@ Bullet.prototype.SetDirectionX = function(speedX) {
       this.mAngle = Math.atan2(this.mDirectionX , -1 * this.mDirectionY);
    }
 };
+
+Bullet.prototype.GetRange = function() {
+   return this.mRange;
+}
 
 Bullet.prototype.GetDirectionY = function() {
 	return this.mDirectionY;
