@@ -15,12 +15,12 @@ function Turret (turretType , width , height) {
    	if (turretType == TurretType.Basic) {
    		this.mBulletType =	BulletType.Metal; 
    		this.mBitmap.src = "images/basic-turret.png";
-   		this.mRange = 10;
+   		this.mRange = 200;
    		this.mDamage = 5;
    		this.mAtckSpeed = 500; //milliseconds
    	} else {
    		this.mBulletType =	BulletType.Fire;
-   		this.mRange = 6;
+   		this.mRange = 150;
    		this.mDamage = 2;
    		this.mAtckSpeed = 100;
    		this.mBitmap.src = "images/basic-turret.png";
@@ -100,4 +100,27 @@ Turret.prototype.MakeBullet = function () {
 	this.mLastShotted = +new Date();
 
 	return newBullet;
+}
+
+Turret.prototype.IsInsideTurret = function(x , y) {
+	var relativeX = this.mCenterX - x;
+	var relativeY = this.mCenterY - y;
+	return relativeX >= -1 * this.mWidth / 2 && relativeX < this.mHeight / 2 && relativeY >= -1 * this.mHeight / 2 && relativeY < this.mHeight / 2;
+}
+
+Turret.prototype.IsInsideRange = function(x , y) {
+	var relativeX = this.mCenterX - x;
+	var relativeY = this.mCenterY - y;
+	var distance = Math.sqrt(relativeX * relativeX + relativeY * relativeY);
+	return distance <= this.mRange;
+}
+
+Turret.prototype.DrawDetails = function(context) {
+	context.translate(this.mCenterX , this.mCenterY);
+	context.fillStyle = "rgba(0, 255, 204, 0.2)";
+	context.beginPath();
+	context.arc(0,0,this.mRange,0,2*Math.PI);
+	context.closePath();
+	context.fill();
+	context.translate(-1 * this.mCenterX , -1 * this.mCenterY);
 }

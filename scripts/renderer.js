@@ -1,4 +1,4 @@
-var MAX_MILLISECONDS = 30;
+var MAX_MILLISECONDS = 20;
 
 function Renderer(canvas) {
 	this.mCanvas = canvas;
@@ -28,7 +28,7 @@ Renderer.prototype.Draw = function() {
 	this.mContext.clearRect(0 , 0 , this.mCanvas.width , this.mCanvas.height);
 	for (var index = 0, found = false; index < this.mBlocks.length ; index++) {
 		this.mBlocks[index].Draw(this.mContext);
-		if (!found && this.mBlocks[index].CheckInside(this.mMouseX , this.mMouseY)) {
+		if (!found && this.mBlocks[index].IsInsideBlock(this.mMouseX , this.mMouseY)) {
 			this.mBlocks[index].DrawSelector(this.mContext);
 			found = true;
 		}
@@ -37,8 +37,12 @@ Renderer.prototype.Draw = function() {
 	for (var index = 0; index < this.mBullets.length ; index++) {
 		this.mBullets[index].Draw(this.mContext);
 	}
-	for (var index = 0; index < this.mTurrets.length ; index++) {
+	for (var index = 0, found = false; index < this.mTurrets.length ; index++) {
 		this.mTurrets[index].Draw(this.mContext);
+		if (!found && this.mTurrets[index].IsInsideTurret(this.mMouseX , this.mMouseY)) {
+			this.mTurrets[index].DrawDetails(this.mContext);
+			found = true;
+		}
 	}
 	for (var index = 0; index < this.mEnemies.length ; index++) {
 		this.mEnemies[index].Draw(this.mContext);
@@ -47,6 +51,7 @@ Renderer.prototype.Draw = function() {
 	this.mContext.restore();
 	var endTime = +new Date();
 	var duration = endTime - startTime;
+	console.log(duration);
 	sleep(30 - duration);
 };
 
@@ -78,11 +83,13 @@ Renderer.prototype.ManipulateObjects = function() {
 		this.mEnemies[index].Move();
 	}
 	for (var index = 0; index < this.mTurrets.length ; index++) {
-		this.mTurrets[index].SetDirectionX(this.mMouseX - this.mTurrets[index].GetCenterX());
-		this.mTurrets[index].SetDirectionY(this.mMouseY - this.mTurrets[index].GetCenterY());
-		var bullet = this.mTurrets[index].MakeBullet();
-		if (bullet != null) {
-			this.mBullets[this.mBullets.length] = bullet;
+		if (this.mTurrets[index].IsInsideRange(this.mMouseX , this.mMouseY)) {
+			this.mTurrets[index].SetDirectionX(this.mMouseX - this.mTurrets[index].GetCenterX());
+			this.mTurrets[index].SetDirectionY(this.mMouseY - this.mTurrets[index].GetCenterY());
+			var bullet = this.mTurrets[index].MakeBullet();
+			if (bullet != null) {
+				this.mBullets[this.mBullets.length] = bullet;
+			}
 		}
 	}
 };
@@ -120,7 +127,7 @@ Renderer.prototype.LoadMap = function(mapName) {
 
 Renderer.prototype.AddTurret = function(turretType , x , y) {
 	for (var index = 0, found = false; index < this.mBlocks.length && !found; index++) {
-		if (this.mBlocks[index].CheckInside(x , y) && this.mBlocks[index].GetType() != BlockType.Dirt) {
+		if (this.mBlocks[index].IsInsideBlock(x , y) && this.mBlocks[index].GetType() != BlockType.Dirt) {
 			var turret = new Turret(turretType , this.mBlocks[index].GetWidth() , this.mBlocks[index].GetHeight());
 			turret.SetCenterX(this.mBlocks[index].GetCenterX());
 			turret.SetCenterY(this.mBlocks[index].GetCenterY());

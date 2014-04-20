@@ -63,12 +63,14 @@ Block.prototype.DrawSelector = function(context) {
 		context.fillStyle = "rgba(222, 14, 14, 0.5)";
 		context.strokeStyle = "red";
 	}
-	context.fillRect(this.mCenterX - this.mWidth / 2 , this.mCenterY - this.mHeight / 2 , this.mWidth , this.mHeight);
-	context.strokeRect(this.mCenterX - this.mWidth / 2 , this.mCenterY - this.mHeight / 2 , this.mWidth , this.mHeight);
+	context.translate(this.mCenterX , this.mCenterY);
+	context.fillRect(-1 *  this.mWidth / 2 ,-1 * this.mHeight / 2 , this.mWidth , this.mHeight);
+	context.strokeRect(-1 * this.mWidth / 2 , -1 * this.mHeight / 2 , this.mWidth , this.mHeight);
+	context.translate(-1 * this.mCenterX , -1 * this.mCenterY); 
 }
 
-Block.prototype.CheckInside = function(x , y) {
+Block.prototype.IsInsideBlock = function(x , y) {
 	var relativeX = this.mCenterX - x;
 	var relativeY = this.mCenterY - y;
-	return relativeX >= -1 * this.mWidth && relativeX < this.mHeight && relativeY >= -1 * this.mHeight && relativeY < this.mHeight;
+	return relativeX >= -1 * this.mWidth / 2 && relativeX < this.mHeight / 2 && relativeY >= -1 * this.mHeight / 2 && relativeY < this.mHeight / 2;
 };
