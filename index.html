@@ -12,24 +12,22 @@
 		<script type="text/javascript" src="scripts/bullet.js"></script>
 		<script type="text/javascript" src="scripts/renderer.js"></script>
 		<script type="text/javascript" src="scripts/block.js"></script>
+		<script type="text/javascript" src="scripts/maps.js"></script>
+		<script type="text/javascript" src="scripts/turret.js"></script>
 		<script>
-		var bullet = new Bullet(BulletType.Fire);
-		bullet.SetCenterX(100);
-		bullet.SetCenterY(100);
-		bullet.SetDirectionX(5);
-		bullet.SetDirectionY(5);
 
 		$(function(){
 			var canvas = document.getElementById("drawing_canvas");
 			var renderer = new Renderer(canvas);
-			renderer.LoadMap("map1");
-			renderer.AddBullet(bullet);
+			renderer.LoadMap("easy_map");
+			renderer.AddTurret(TurretType.Basic , 500 , 500);
+			renderer.AddTurret(TurretType.Basic , 800 , 400);
 			document.addEventListener('mousemove', function(e){ 
 	   			renderer.SetMousePos(e.clientX || e.pageX , e.clientY || e.pageY);
 			}, false);
 
 			var inter = setInterval(function(){
-				renderer.MoveObjects();
+				renderer.ManipulateObjects();
 				renderer.Draw();
 			},10);
 		});

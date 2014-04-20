@@ -43,41 +43,61 @@ Renderer.prototype.Draw = function() {
 	for (var index = 0; index < this.mEnemies.length ; index++) {
 		this.mEnemies[index].Draw(this.mContext);
 	}
+
 	this.mContext.restore();
 	var endTime = +new Date();
 	var duration = endTime - startTime;
 	sleep(30 - duration);
 };
 
-Renderer.prototype.MoveObjects = function() {
+Array.prototype.Swap = function (pos1 , pos2) {
+	var x = this[pos1];
+	this[pos1] = this[pos2];
+	this[pos2] = x;
+}
+
+Renderer.prototype.ManipulateObjects = function() {
+
+	var outside = 0;
+	for (var index = 0; index < this.mBullets.length - outside; index++) {
+		if (!(this.mBullets[index].GetCenterX() >= 0 && this.mBullets[index].GetCenterX() < this.mCanvas.width && this.mBullets[index].GetCenterY() >= 0 && this.mBullets[index].GetCenterY() < this.mCanvas.height)){
+			this.mBullets.Swap(index , this.mBullets.length - outside - 1);
+			outside ++;
+			index --;
+			// Swap with the last for fast removal;
+		}
+	}
+
+	this.mBullets = this.mBullets.slice(0 , this.mBullets.length - outside);
+	// Remove the bullets that go outside
+
 	for (var index = 0; index < this.mBullets.length ; index++) {
-		this.mBullets[index].SetCenterX(this.mBullets[index].GetCenterX() + this.mBullets[index].GetDirectionX());
-		this.mBullets[index].SetCenterY(this.mBullets[index].GetCenterY() + this.mBullets[index].GetDirectionY());
+		this.mBullets[index].Move();
 	}
 	for (var index = 0; index < this.mEnemies.length ; index++) {
-		this.mEnemies[index].SetCenterX(this.mEnemies[index].GetCenterX() + this.mEnemies[index].GetDirectionX());
-		this.mEnemies[index].SetCenterY(this.mEnemies[index].GetCenterY() + this.mEnemies[index].GetDirectionY());
+		this.mEnemies[index].Move();
 	}
-}
+	for (var index = 0; index < this.mTurrets.length ; index++) {
+		this.mTurrets[index].SetDirectionX(this.mMouseX - this.mTurrets[index].GetCenterX());
+		this.mTurrets[index].SetDirectionY(this.mMouseY - this.mTurrets[index].GetCenterY());
+		var bullet = this.mTurrets[index].MakeBullet();
+		if (bullet != null) {
+			this.mBullets[this.mBullets.length] = bullet;
+		}
+	}
+};
 
 Renderer.prototype.SetMousePos = function(x , y) {
 	this.mMouseX = x;
 	this.mMouseY = y;
-}
+};
 
 Renderer.prototype.CheckCollisions = function() {
 
-}
-
-Renderer.prototype.AddBullet = function(bullet) {
-	this.mBullets[this.mBullets.length] = bullet;
 };
 
-Renderer.prototype.LoadMap = function(mapFile) {
-	var request = new XMLHttpRequest(); 
-	request.open("GET","maps/" + mapFile + ".map",false); 
-	request.send(); 
-	var contents = request.responseText;
+Renderer.prototype.LoadMap = function(mapName) {
+	var contents = Maps[mapName];
 
 	var row = 0, col = 0;
 
@@ -96,4 +116,18 @@ Renderer.prototype.LoadMap = function(mapFile) {
 		}
 	}
 	this.mBlocks = tempBlocks;
-}
+};
+
+Renderer.prototype.AddTurret = function(turretType , x , y) {
+	for (var index = 0, found = false; index < this.mBlocks.length && !found; index++) {
+		if (this.mBlocks[index].CheckInside(x , y) && this.mBlocks[index].GetType() != BlockType.Dirt) {
+			var turret = new Turret(turretType , this.mBlocks[index].GetWidth() , this.mBlocks[index].GetHeight());
+			turret.SetCenterX(this.mBlocks[index].GetCenterX());
+			turret.SetCenterY(this.mBlocks[index].GetCenterY());
+			this.mTurrets[this.mTurrets.length] = turret;
+			this.mBullets[this.mBullets.length] = turret.MakeBullet();
+			found = true;
+		}
+	}
+};
+

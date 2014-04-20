@@ -6,20 +6,23 @@ var BulletType = {
 function Bullet(bulletType){
 
    // Add object properties like this
+   this.mDirectionX = 0.0;
+   this.mDirectionY = 0.0;
+   this.mAngle = 0.0;
    this.mCenterX = 0.0;
    this.mCenterY = 0.0;
-   this.mDirectionX = -1.0;
-   this.mDirectionY = -1.0;
    this.mBulletType = bulletType;
    this.mBitmap = new Image();
    if (bulletType == BulletType.Metal) {
-   	this.mBitmap.src = "images/metal-bullet.png";
-   	this.mWidth = 8.5;
-   	this.mHeight = 30;
+      this.mBitmap.src = "images/metal-bullet.png";
+      this.mWidth = 8.5;
+      this.mHeight = 30;
+      this.mSpeed = 12.0;
    } else if (bulletType == BulletType.Fire) {
-   	this.mBitmap.src = "images/fire-bullet.png";
-   	this.mWidth = 15;
-   	this.mHeight = 30;
+      this.mBitmap.src = "images/fire-bullet.png";
+      this.mWidth = 15;
+      this.mHeight = 30;
+      this.mSpeed = 21.0;
    }
 }
 
@@ -47,6 +50,11 @@ Bullet.prototype.GetDirectionX = function() {
 
 Bullet.prototype.SetDirectionX = function(speedX) {
 	this.mDirectionX = speedX;
+   if (this.mDirectionX == 0.0 && this.mDirectionY == 0.0) {
+      this.mAngle = 0.0;
+   } else {
+      this.mAngle = Math.atan2(this.mDirectionX , -1 * this.mDirectionY);
+   }
 };
 
 Bullet.prototype.GetDirectionY = function() {
@@ -54,15 +62,24 @@ Bullet.prototype.GetDirectionY = function() {
 };
 
 Bullet.prototype.SetDirectionY = function(speedY) {
-	this.mDirectionY = speedY;
+   this.mDirectionY = speedY;
+   if (this.mDirectionX == 0.0 && this.mDirectionY == 0.0) {
+      this.mAngle = 0.0;
+   } else {
+      this.mAngle = Math.atan2(this.mDirectionX , -1 * this.mDirectionY);
+   }
 }
 
 Bullet.prototype.Draw = function(context) {
-	var angle = Math.atan2(this.mDirectionX , -1 * this.mDirectionY);
    context.translate(this.mCenterX , this.mCenterY); 
-   context.rotate(angle);
+   context.rotate(this.mAngle);
 	context.drawImage(this.mBitmap , -1 * this.mWidth / 2, -1 * this.mHeight / 2, this.mWidth , this.mHeight);
-   context.rotate(-1 * angle );
+   context.rotate(-1 * this.mAngle );
    context.translate(-1 * this.mCenterX , -1 * this.mCenterY);
-}
+};
+
+Bullet.prototype.Move = function() {
+   this.mCenterX += Math.sin(this.mAngle) * this.mSpeed;
+   this.mCenterY += -1 * Math.cos(this.mAngle) * this.mSpeed;
+};
 
