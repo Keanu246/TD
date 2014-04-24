@@ -1,6 +1,6 @@
 var TurretType = {
 	Basic:1,
-	Flamer:2,
+	Flaming:2,
 };
 
 function Turret (turretType , width , height) {
@@ -18,9 +18,9 @@ function Turret (turretType , width , height) {
    		this.mRange = 200;
    		this.mDamage = 5;
    		this.mAtckSpeed = 500; //milliseconds
-   	} else {
+   	} else if (turretType == TurretType.Flaming) {
    		this.mBulletType =	BulletType.Fire;
-   		this.mRange = 150;
+   		this.mRange = 130;
    		this.mDamage = 2;
    		this.mAtckSpeed = 100;
    		this.mBitmap.src = "images/basic-turret.png";
@@ -116,11 +116,34 @@ Turret.prototype.IsInsideRange = function(x , y) {
 }
 
 Turret.prototype.DrawDetails = function(context) {
+
 	context.translate(this.mCenterX , this.mCenterY);
-	context.fillStyle = "rgba(0, 255, 204, 0.2)";
+	context.fillStyle = "rgba(0, 255, 204, 0.15)";
 	context.beginPath();
 	context.arc(0,0,this.mRange,0,2*Math.PI);
 	context.closePath();
 	context.fill();
 	context.translate(-1 * this.mCenterX , -1 * this.mCenterY);
+
+	context.translate(0.0 , 0.0);
+	context.fillStyle = "rgba(4, 12, 41, 0.8)";
+	context.fillRect(0 , 0 , 230 , 150);
+
+	context.translate(10 , 40.0);
+	context.font = "30px Helvetica";
+	context.fillStyle = "white";
+
+	if (this.mType == TurretType.Flaming) {
+		context.fillText("Flaming turret" , 20 , 0);
+	} else if (this.mType == TurretType.Basic) {
+		context.fillText("Basic turret" , 20 , 0);
+	}
+	
+	context.font = "20px Helvetica";
+	context.fillText("Damage : " + this.mDamage , 0 , 40);
+	context.fillText("Atack speed : " + (this.mAtckSpeed / 1000) + "s" , 0 , 70);
+	context.fillText("Range : " + this.mRange , 0 , 100);
+
+	context.translate(-1 * 10.0 , -1 * 40);
+
 }
