@@ -21,9 +21,18 @@ function sleep (milliseconds) {
 	while(currentTime - startTime < milliseconds);
 }
 
+Renderer.prototype.RenderAll = function() {
+	var startTime = +new Date();
+	this.ManipulateObjects();
+	this.Draw();
+	var endTime = +new Date();
+	var duration = endTime - startTime;
+	console.log(duration);
+	sleep(MAX_MILLISECONDS - duration);
+}
+
 Renderer.prototype.Draw = function() {
 
-	var startTime = +new Date();
 	this.mContext.save();
 	this.mContext.clearRect(0 , 0 , this.mCanvas.width , this.mCanvas.height);
 	for (var index = 0, found = false; index < this.mBlocks.length ; index++) {
@@ -49,10 +58,6 @@ Renderer.prototype.Draw = function() {
 	}
 
 	this.mContext.restore();
-	var endTime = +new Date();
-	var duration = endTime - startTime;
-	console.log(duration);
-	sleep(30 - duration);
 };
 
 Array.prototype.Swap = function (pos1 , pos2) {

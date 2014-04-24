@@ -85,7 +85,8 @@ Bullet.prototype.Draw = function(context) {
 };
 
 Bullet.prototype.Move = function() {
-   this.mCenterX += Math.sin(this.mAngle) * this.mSpeed;
-   this.mCenterY += -1 * Math.cos(this.mAngle) * this.mSpeed;
+   var distance = Math.sqrt(this.mDirectionX * this.mDirectionX + this.mDirectionY * this.mDirectionY);
+   this.mCenterX += (this.mDirectionX / distance) * this.mSpeed;
+   this.mCenterY += (this.mDirectionY / distance) * this.mSpeed;
 };
 
