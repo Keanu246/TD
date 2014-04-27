@@ -13,7 +13,7 @@ function Block(blockType , width , height){
    if (blockType == BlockType.Dirt) {
    	this.mBitmap.src = "images/block-dirt.png";
    } else if (blockType == BlockType.Road) {
-   	this.mBitmap.src = "images/block-road.png"
+   	this.mBitmap.src = "images/block-road.png";
    }
    this.mWidth = width;
    this.mHeight = height;

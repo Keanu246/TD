@@ -46,15 +46,15 @@ Renderer.prototype.Draw = function() {
 	for (var index = 0; index < this.mBullets.length ; index++) {
 		this.mBullets[index].Draw(this.mContext);
 	}
+	for (var index = 0; index < this.mEnemies.length ; index++) {
+		this.mEnemies[index].Draw(this.mContext);
+	}
 	for (var index = 0, found = false; index < this.mTurrets.length ; index++) {
 		this.mTurrets[index].Draw(this.mContext);
 		if (!found && this.mTurrets[index].IsInsideTurret(this.mMouseX , this.mMouseY)) {
 			this.mTurrets[index].DrawDetails(this.mContext);
 			found = true;
 		}
-	}
-	for (var index = 0; index < this.mEnemies.length ; index++) {
-		this.mEnemies[index].Draw(this.mContext);
 	}
 
 	this.mContext.restore();
@@ -69,29 +69,47 @@ Array.prototype.Swap = function (pos1 , pos2) {
 Renderer.prototype.ManipulateObjects = function() {
 
 	var outside = 0;
-	for (var index = 0; index < this.mBullets.length - outside; index++) {
-		if (!(this.mBullets[index].GetCenterX() >= 0 && this.mBullets[index].GetCenterX() < this.mCanvas.width && this.mBullets[index].GetCenterY() >= 0 && this.mBullets[index].GetCenterY() < this.mCanvas.height)){
-			this.mBullets.Swap(index , this.mBullets.length - outside - 1);
+	for (var bulletIndex = 0; bulletIndex < this.mBullets.length - outside; bulletIndex++) {
+		if (!(this.mBullets[bulletIndex].GetCenterX() >= 0 && this.mBullets[bulletIndex].GetCenterX() < this.mCanvas.width && this.mBullets[bulletIndex].GetCenterY() >= 0 && this.mBullets[bulletIndex].GetCenterY() < this.mCanvas.height)){
+			
+			// Check if the bullet is outside
+			this.mBullets.Swap(bulletIndex , this.mBullets.length - outside - 1);
 			outside ++;
-			index --;
+			bulletIndex --;
 			// Swap with the last for fast removal;
+		} else {
+			for (var enemyIndex = 0; enemyIndex < this.mEnemies.length; enemyIndex ++) {
+				if (this.mEnemies[enemyIndex].CheckCollision(this.mBullets[bulletIndex])) {
+					this.mEnemies[enemyIndex].SetLife(this.mEnemies[enemyIndex].GetLife() - this.mBullets[bulletIndex].GetDamage());
+					this.mBullets.Swap(bulletIndex , this.mBullets.length - outside - 1);
+					outside ++;
+					bulletIndex --;
+
+					if (this.mEnemies[enemyIndex].GetLife() <= 0) {
+						this.mEnemies.Swap(enemyIndex , this.mEnemies.length - 1);
+						this.mEnemies = this.mEnemies.slice(0 , this.mEnemies.length - 1);
+					}
+					break;
+				}
+			}
 		}
+
 	}
 
 	this.mBullets = this.mBullets.slice(0 , this.mBullets.length - outside);
-	// Remove the bullets that go outside
+	// Remove the bullets that go outside or make collision with an enemy
 
-	for (var index = 0; index < this.mBullets.length ; index++) {
-		this.mBullets[index].Move();
+	for (var bulletIndex = 0; bulletIndex < this.mBullets.length ; bulletIndex++) {
+		this.mBullets[bulletIndex].Move();
 	}
-	for (var index = 0; index < this.mEnemies.length ; index++) {
-		this.mEnemies[index].Move();
+	for (var enemyIndex = 0; enemyIndex < this.mEnemies.length ; enemyIndex++) {
+		this.mEnemies[enemyIndex].Move();
 	}
-	for (var index = 0; index < this.mTurrets.length ; index++) {
-		if (this.mTurrets[index].IsInsideRange(this.mMouseX , this.mMouseY)) {
-			this.mTurrets[index].SetDirectionX(this.mMouseX - this.mTurrets[index].GetCenterX());
-			this.mTurrets[index].SetDirectionY(this.mMouseY - this.mTurrets[index].GetCenterY());
-			var bullet = this.mTurrets[index].MakeBullet();
+	for (var turretIndex = 0; turretIndex < this.mTurrets.length ; turretIndex++) {
+		if (this.mTurrets[turretIndex].IsInsideRange(this.mMouseX , this.mMouseY)) {
+			this.mTurrets[turretIndex].SetDirectionX(this.mMouseX - this.mTurrets[turretIndex].GetCenterX());
+			this.mTurrets[turretIndex].SetDirectionY(this.mMouseY - this.mTurrets[turretIndex].GetCenterY());
+			var bullet = this.mTurrets[turretIndex].MakeBullet();
 			if (bullet != null) {
 				this.mBullets[this.mBullets.length] = bullet;
 			}
@@ -127,6 +145,12 @@ Renderer.prototype.LoadMap = function(mapName) {
 			col = 0;
 		}
 	}
+	var enem = new Enemy(EnemyType.Basic , 30 , 30);
+	enem.SetCenterX(300.0);
+	enem.SetCenterY(300.0);
+	enem.SetDirectionX(10);
+	enem.SetDirectionY(10);
+	this.mEnemies[this.mEnemies.length] = enem;
 	this.mBlocks = tempBlocks;
 };
 

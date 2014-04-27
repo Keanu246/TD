@@ -16,12 +16,10 @@ function Turret (turretType , width , height) {
    		this.mBulletType =	BulletType.Metal; 
    		this.mBitmap.src = "images/basic-turret.png";
    		this.mRange = 200;
-   		this.mDamage = 5;
    		this.mAtckSpeed = 500; //milliseconds
    	} else if (turretType == TurretType.Flaming) {
    		this.mBulletType =	BulletType.Fire;
    		this.mRange = 130;
-   		this.mDamage = 2;
    		this.mAtckSpeed = 100;
    		this.mBitmap.src = "images/basic-turret.png";
    	}
@@ -29,6 +27,18 @@ function Turret (turretType , width , height) {
 }
 
 Turret.prototype.Constructor = Turret;
+
+Turret.prototype.GetRange = function() {
+	return this.mRange;
+};
+
+Turret.prototype.GetAtackSpeed = function() {
+	return this.mAtckSpeed;
+};
+
+Turret.prototype.GetBulletType = function() {
+	return this.mBulletType;
+};
 
 Turret.prototype.GetType = function() {
 	return this.mType;
@@ -64,7 +74,7 @@ Turret.prototype.GetDirectionY = function() {
 
 Turret.prototype.SetDirectionY = function(speedY) {
 	this.mDirectionY = speedY;
-}
+};
 
 Turret.prototype.Draw = function(context) {
 	var angle = 0.0;
@@ -78,42 +88,43 @@ Turret.prototype.Draw = function(context) {
 	context.drawImage(this.mBitmap , -1 * this.mWidth / 2, -1 * (this.mHeight) / 2, this.mWidth , this.mHeight);
     context.rotate(-1 * angle );
     context.translate(-1 * this.mCenterX , -1 * this.mCenterY);
-}
+};
 
 Turret.prototype.MakeBullet = function () {
 	if (+new Date() - this.mLastShotted <= this.mAtckSpeed) {
 		return null;
 	}
-	var angle = 0.0;
-	if (this.mDirectionX == 0 && this.mDirectionY == 0) {
-		angle = 0.0;
-	} else {
-		angle = Math.atan2(this.mDirectionX , -1 * this.mDirectionY);
-	}
-	distance = this.mHeight / 2;
-
 	var newBullet = new Bullet(this.mBulletType);
 	newBullet.SetDirectionX(this.mDirectionX);
 	newBullet.SetDirectionY(this.mDirectionY);
-	newBullet.SetCenterX(this.mCenterX + distance * Math.sin(angle));
-	newBullet.SetCenterY(this.mCenterY + (-1 * distance * Math.cos(angle)));
+
+	vectorNorm = Math.sqrt(this.mDirectionX * this.mDirectionX + this.mDirectionY * this.mDirectionY);
+	distance = this.mHeight / 2;
+	if (vectorNorm != 0) {
+		newBullet.SetCenterX(this.mCenterX + distance * this.mDirectionX / vectorNorm);
+		newBullet.SetCenterY(this.mCenterY + distance * this.mDirectionY / vectorNorm);
+	} else {
+		newBullet.SetCenterX(this.mCenterX);
+		newBullet.SetCenterY(this.mCenterY - distance);
+	}
+
 	this.mLastShotted = +new Date();
 
 	return newBullet;
-}
+};
 
 Turret.prototype.IsInsideTurret = function(x , y) {
 	var relativeX = this.mCenterX - x;
 	var relativeY = this.mCenterY - y;
 	return relativeX >= -1 * this.mWidth / 2 && relativeX < this.mHeight / 2 && relativeY >= -1 * this.mHeight / 2 && relativeY < this.mHeight / 2;
-}
+};
 
 Turret.prototype.IsInsideRange = function(x , y) {
 	var relativeX = this.mCenterX - x;
 	var relativeY = this.mCenterY - y;
 	var distance = Math.sqrt(relativeX * relativeX + relativeY * relativeY);
 	return distance <= this.mRange;
-}
+};
 
 Turret.prototype.DrawDetails = function(context) {
 
@@ -140,10 +151,14 @@ Turret.prototype.DrawDetails = function(context) {
 	}
 	
 	context.font = "20px Helvetica";
-	context.fillText("Damage : " + this.mDamage , 0 , 40);
+	if (this.mType == TurretType.Flaming) {
+		context.fillText("Damage : 2 x 1", 0 , 40);
+	} else if (this.mType == TurretType.Basic) {
+		context.fillText("Damage : 5 x 1", 0 , 40);
+	}
 	context.fillText("Atack speed : " + (this.mAtckSpeed / 1000) + "s" , 0 , 70);
 	context.fillText("Range : " + this.mRange , 0 , 100);
 
 	context.translate(-1 * 10.0 , -1 * 40);
 
-}
+};
