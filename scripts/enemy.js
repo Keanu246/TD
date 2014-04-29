@@ -13,14 +13,17 @@ function Enemy (enemyType , width , height) {
 	this.mType = enemyType;
 	this.mBitmap = new Image();
 	if (enemyType == EnemyType.Basic) {
-		this.mLife = 40;
-		this.mStartLife = this.mLife;
+		this.mMoney = 100;
 		this.mSpeed = 3.0;
 		this.mBitmap.src = "images/basic-enemy.png";
 	}
 }
 
 Enemy.prototype.Constructor = Enemy;
+
+Enemy.prototype.GetMoney = function() {
+	return this.mMoney;
+};
 
 Enemy.prototype.GetType = function() {
 	return this.mType;
@@ -41,6 +44,15 @@ Enemy.prototype.SetLife = function(life) {
 Enemy.prototype.GetLife = function() {
 	return this.mLife;
 };
+
+Enemy.prototype.SetMaxLife = function(life) {
+	this.mStartLife = life;
+	this.mLife = life;
+}
+
+Enemy.prototype.GetStartLife = function() {
+	return this.mStartLife;
+}
 
 Enemy.prototype.SetSpeed = function(speed) {
 	this.mSpeed = speed;

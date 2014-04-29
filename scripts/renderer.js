@@ -78,6 +78,7 @@ Renderer.prototype.ManipulateObjects = function() {
 			bulletIndex --;
 			// Swap with the last for fast removal;
 		} else {
+			// If the bullet is not outside , then we check collision with bullets
 			for (var enemyIndex = 0; enemyIndex < this.mEnemies.length; enemyIndex ++) {
 				if (this.mEnemies[enemyIndex].CheckCollision(this.mBullets[bulletIndex])) {
 					this.mEnemies[enemyIndex].SetLife(this.mEnemies[enemyIndex].GetLife() - this.mBullets[bulletIndex].GetDamage());
@@ -106,9 +107,30 @@ Renderer.prototype.ManipulateObjects = function() {
 		this.mEnemies[enemyIndex].Move();
 	}
 	for (var turretIndex = 0; turretIndex < this.mTurrets.length ; turretIndex++) {
-		if (this.mTurrets[turretIndex].IsInsideRange(this.mMouseX , this.mMouseY)) {
-			this.mTurrets[turretIndex].SetDirectionX(this.mMouseX - this.mTurrets[turretIndex].GetCenterX());
-			this.mTurrets[turretIndex].SetDirectionY(this.mMouseY - this.mTurrets[turretIndex].GetCenterY());
+
+		var closestEnemy = null;
+		var minDistance = 100000;
+
+		for (var enemyIndex = 0; enemyIndex < this.mEnemies.length; enemyIndex ++) {
+			var relX = this.mEnemies[enemyIndex].GetCenterX() - this.mTurrets[turretIndex].GetCenterX();
+			var relY = this.mEnemies[enemyIndex].GetCenterY() - this.mTurrets[turretIndex].GetCenterY();
+			var distance = Math.sqrt(relX * relX + relY * relY);
+			if (distance < minDistance) {
+				closestEnemy = this.mEnemies[enemyIndex];
+				minDistance = distance;
+			}
+		}
+
+		if (this.mTurrets[turretIndex].GetFocusedEnemy() == null || !this.mTurrets[turretIndex].IsInsideRange(this.mTurrets[turretIndex].GetFocusedEnemy().GetCenterX() , this.mTurrets[turretIndex].GetFocusedEnemy().GetCenterY()) || this.mTurrets[turretIndex].GetFocusedEnemy().GetLife() <= 0)
+		{
+			if (closestEnemy != null && this.mTurrets[turretIndex].IsInsideRange(closestEnemy.GetCenterX() , closestEnemy.GetCenterY())) {
+				this.mTurrets[turretIndex].SetFocusedEnemy(closestEnemy);
+				var bullet = this.mTurrets[turretIndex].MakeBullet();
+				if (bullet != null) {
+					this.mBullets[this.mBullets.length] = bullet;
+				}
+			}
+		} else {
 			var bullet = this.mTurrets[turretIndex].MakeBullet();
 			if (bullet != null) {
 				this.mBullets[this.mBullets.length] = bullet;
@@ -120,10 +142,6 @@ Renderer.prototype.ManipulateObjects = function() {
 Renderer.prototype.SetMousePos = function(x , y) {
 	this.mMouseX = x;
 	this.mMouseY = y;
-};
-
-Renderer.prototype.CheckCollisions = function() {
-
 };
 
 Renderer.prototype.LoadMap = function(mapName) {
@@ -145,12 +163,17 @@ Renderer.prototype.LoadMap = function(mapName) {
 			col = 0;
 		}
 	}
-	var enem = new Enemy(EnemyType.Basic , 30 , 30);
-	enem.SetCenterX(300.0);
-	enem.SetCenterY(300.0);
-	enem.SetDirectionX(10);
-	enem.SetDirectionY(10);
-	this.mEnemies[this.mEnemies.length] = enem;
+	for (var i = 0; i < 10 ; i++) {
+
+		var enem = new Enemy(EnemyType.Basic , 30 , 30);
+		enem.SetCenterX(-100.0 + i * 50);
+		enem.SetCenterY(400.0);
+		enem.SetDirectionX(10);
+		enem.SetDirectionY(0);
+		enem.SetMaxLife(20);
+		this.mEnemies[this.mEnemies.length] = enem;
+	}
+
 	this.mBlocks = tempBlocks;
 };
 

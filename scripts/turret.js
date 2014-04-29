@@ -6,21 +6,21 @@ var TurretType = {
 function Turret (turretType , width , height) {
 	this.mCenterX = 0.0;
    	this.mCenterY = 0.0;
-   	this.mDirectionX = 0.0;
-   	this.mDirectionY = 0.0;
+   	this.mFocusedEnemy = 0.0;
    	this.mType = turretType;
    	this.mWidth = width;
    	this.mHeight = height + 7;
    	this.mBitmap = new Image();
+   	this.mFocusedEnemy = null;
    	if (turretType == TurretType.Basic) {
    		this.mBulletType =	BulletType.Metal; 
    		this.mBitmap.src = "images/basic-turret.png";
    		this.mRange = 200;
-   		this.mAtckSpeed = 500; //milliseconds
+   		this.mAtckSpeed = 300; //milliseconds
    	} else if (turretType == TurretType.Flaming) {
    		this.mBulletType =	BulletType.Fire;
    		this.mRange = 130;
-   		this.mAtckSpeed = 100;
+   		this.mAtckSpeed = 30;
    		this.mBitmap.src = "images/basic-turret.png";
    	}
    	this.mLastShotted = 0;
@@ -60,28 +60,20 @@ Turret.prototype.GetCenterY = function() {
 	return this.mCenterY;
 };
 
-Turret.prototype.GetDirectionX = function() {
-	return this.mDirectionX;
+Turret.prototype.GetFocusedEnemy = function() {
+	return this.mFocusedEnemy;
 };
 
-Turret.prototype.SetDirectionX = function(speedX) {
-	this.mDirectionX = speedX;
-};
-
-Turret.prototype.GetDirectionY = function() {
-	return this.mDirectionY;
-};
-
-Turret.prototype.SetDirectionY = function(speedY) {
-	this.mDirectionY = speedY;
+Turret.prototype.SetFocusedEnemy = function(enemy) {
+	this.mFocusedEnemy = enemy;
 };
 
 Turret.prototype.Draw = function(context) {
 	var angle = 0.0;
-	if (this.mDirectionX == 0 && this.mDirectionY == 0) {
-		angle = 0.0;
-	} else {
-		angle = Math.atan2(this.mDirectionX , -1 * this.mDirectionY);
+	if (this.mFocusedEnemy != null) {
+		var directionX = this.mFocusedEnemy.GetCenterX() - this.mCenterX;
+		var directionY = this.mFocusedEnemy.GetCenterY() - this.mCenterY;
+		angle = Math.atan2(directionX , -1 * directionY);
 	}
     context.translate(this.mCenterX , this.mCenterY); 
     context.rotate(angle);
@@ -91,18 +83,19 @@ Turret.prototype.Draw = function(context) {
 };
 
 Turret.prototype.MakeBullet = function () {
-	if (+new Date() - this.mLastShotted <= this.mAtckSpeed) {
+	// If turret is reloading , or it doesnt have where to shoot , it return null
+	if (+new Date() - this.mLastShotted <= this.mAtckSpeed || this.mFocusedEnemy == null) {
 		return null;
 	}
 	var newBullet = new Bullet(this.mBulletType);
-	newBullet.SetDirectionX(this.mDirectionX);
-	newBullet.SetDirectionY(this.mDirectionY);
+	newBullet.SetDirectionX(this.mFocusedEnemy.GetCenterX() - this.mCenterX);
+	newBullet.SetDirectionY(this.mFocusedEnemy.GetCenterY() - this.mCenterY);
 
-	vectorNorm = Math.sqrt(this.mDirectionX * this.mDirectionX + this.mDirectionY * this.mDirectionY);
+	vectorNorm = Math.sqrt(newBullet.GetDirectionX() * newBullet.GetDirectionX() + newBullet.GetDirectionY() * newBullet.GetDirectionY());
 	distance = this.mHeight / 2;
 	if (vectorNorm != 0) {
-		newBullet.SetCenterX(this.mCenterX + distance * this.mDirectionX / vectorNorm);
-		newBullet.SetCenterY(this.mCenterY + distance * this.mDirectionY / vectorNorm);
+		newBullet.SetCenterX(this.mCenterX + distance * newBullet.GetDirectionX() / vectorNorm);
+		newBullet.SetCenterY(this.mCenterY + distance * newBullet.GetDirectionY() / vectorNorm);
 	} else {
 		newBullet.SetCenterX(this.mCenterX);
 		newBullet.SetCenterY(this.mCenterY - distance);
