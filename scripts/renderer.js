@@ -1,4 +1,6 @@
 var MAX_MILLISECONDS = 20;
+var frames  = 0;
+var lastTime = +new Date();
 
 function Renderer(canvas) {
 	this.mCanvas = canvas;
@@ -25,8 +27,14 @@ Renderer.prototype.RenderAll = function() {
 	this.Draw();
 	var endTime = +new Date();
 	var duration = endTime - startTime;
-	console.log(duration);
 	sleep(MAX_MILLISECONDS - duration);
+	frames++;
+	if (+new Date() - lastTime >= 1000) {
+		console.log("FPS" , frames);
+		lastTime = +new Date();
+		frames = 0;
+	}
+
 }
 
 Renderer.prototype.Draw = function() {
@@ -97,12 +105,13 @@ Renderer.prototype.ManipulateObjects = function() {
 	}
 
 	outside = 0;
-	for (var enemyIndex = 0; enemyIndex < this.mEnemies.length ; enemyIndex++) {
+	for (var enemyIndex = 0; enemyIndex < this.mEnemies.length - outside ; enemyIndex++) {
 		this.mMap.KeepObjectOnPath(this.mEnemies[enemyIndex]);
 
 		if (!(this.mEnemies[enemyIndex].GetCenterX() >= 0 && this.mEnemies[enemyIndex].GetCenterX() < this.mCanvas.width && this.mEnemies[enemyIndex].GetCenterY() >= 0 && this.mEnemies[enemyIndex].GetCenterY() < this.mCanvas.height)){
 			this.mEnemies.Swap(enemyIndex , this.mEnemies.length - outside - 1);
 			outside ++;
+			enemyIndex --;
 		}
 	}
 
@@ -152,15 +161,16 @@ Renderer.prototype.SetMousePos = function(x , y) {
 	this.mMap.SetMouseY(y);
 };
 
-Renderer.prototype.LoadMap = function(mapName) {
-	
-	this.mMap.LoadMap("easy_map")
+Renderer.prototype.LoadMap = function(mapName) {	
+	this.mMap.LoadMap("easy_map");
+};
 
+Renderer.prototype.SpawnRandomEnemy = function() {
 	var enemy = new Enemy(EnemyType.Basic , 30 , 30);
 	this.mMap.MoveObjectToStart(enemy);
-	enemy.SetMaxLife(1000);
+	enemy.SetMaxLife(70);
 	this.mEnemies[this.mEnemies.length] = enemy;
-};
+}
 
 Renderer.prototype.AddTurret = function(turretType , x , y) {
 	var found = false;
