@@ -4,11 +4,9 @@ function Renderer(canvas) {
 	this.mCanvas = canvas;
 	this.mContext = canvas.getContext("2d");
 	this.mBullets = [];
-	this.mBlocks = [];
 	this.mTurrets = [];
 	this.mEnemies = [];
-	this.mMouseX = 0;
-	this.mMouseY = 0;
+	this.mMap = new Map();
 }
 
 function sleep (milliseconds) {
@@ -35,13 +33,8 @@ Renderer.prototype.Draw = function() {
 
 	this.mContext.save();
 	this.mContext.clearRect(0 , 0 , this.mCanvas.width , this.mCanvas.height);
-	for (var index = 0, found = false; index < this.mBlocks.length ; index++) {
-		this.mBlocks[index].Draw(this.mContext);
-		if (!found && this.mBlocks[index].IsInsideBlock(this.mMouseX , this.mMouseY)) {
-			this.mBlocks[index].DrawSelector(this.mContext);
-			found = true;
-		}
-	}
+
+	this.mMap.Draw(this.mContext);
 
 	for (var index = 0; index < this.mBullets.length ; index++) {
 		this.mBullets[index].Draw(this.mContext);
@@ -94,7 +87,6 @@ Renderer.prototype.ManipulateObjects = function() {
 				}
 			}
 		}
-
 	}
 
 	this.mBullets = this.mBullets.slice(0 , this.mBullets.length - outside);
@@ -103,9 +95,23 @@ Renderer.prototype.ManipulateObjects = function() {
 	for (var bulletIndex = 0; bulletIndex < this.mBullets.length ; bulletIndex++) {
 		this.mBullets[bulletIndex].Move();
 	}
+
+	outside = 0;
+	for (var enemyIndex = 0; enemyIndex < this.mEnemies.length ; enemyIndex++) {
+		this.mMap.KeepObjectOnPath(this.mEnemies[enemyIndex]);
+
+		if (!(this.mEnemies[enemyIndex].GetCenterX() >= 0 && this.mEnemies[enemyIndex].GetCenterX() < this.mCanvas.width && this.mEnemies[enemyIndex].GetCenterY() >= 0 && this.mEnemies[enemyIndex].GetCenterY() < this.mCanvas.height)){
+			this.mEnemies.Swap(enemyIndex , this.mEnemies.length - outside - 1);
+			outside ++;
+		}
+	}
+
+	this.mEnemies = this.mEnemies.slice(0 , this.mEnemies.length - outside);
+
 	for (var enemyIndex = 0; enemyIndex < this.mEnemies.length ; enemyIndex++) {
 		this.mEnemies[enemyIndex].Move();
 	}
+
 	for (var turretIndex = 0; turretIndex < this.mTurrets.length ; turretIndex++) {
 
 		var closestEnemy = null;
@@ -142,49 +148,32 @@ Renderer.prototype.ManipulateObjects = function() {
 Renderer.prototype.SetMousePos = function(x , y) {
 	this.mMouseX = x;
 	this.mMouseY = y;
+	this.mMap.SetMouseX(x);
+	this.mMap.SetMouseY(y);
 };
 
 Renderer.prototype.LoadMap = function(mapName) {
-	var contents = Maps[mapName];
+	
+	this.mMap.LoadMap("easy_map")
 
-	var row = 0, col = 0;
-
-	var tempBlocks = [];
-
-	for (var stringPos = 0; stringPos < contents.length; stringPos++) {
-		if (contents[stringPos] != '\n') {
-			var block = new Block(contents[stringPos] - '0' , 60 , 60);
-			block.SetCenterX(col * 60);
-			block.SetCenterY(row * 60);
-			tempBlocks[tempBlocks.length] = block;
-			col++;
-		} else {
-			row++;
-			col = 0;
-		}
-	}
-	for (var i = 0; i < 10 ; i++) {
-
-		var enem = new Enemy(EnemyType.Basic , 30 , 30);
-		enem.SetCenterX(-100.0 + i * 50);
-		enem.SetCenterY(400.0);
-		enem.SetDirectionX(10);
-		enem.SetDirectionY(0);
-		enem.SetMaxLife(20);
-		this.mEnemies[this.mEnemies.length] = enem;
-	}
-
-	this.mBlocks = tempBlocks;
+	var enemy = new Enemy(EnemyType.Basic , 30 , 30);
+	this.mMap.MoveObjectToStart(enemy);
+	enemy.SetMaxLife(1000);
+	this.mEnemies[this.mEnemies.length] = enemy;
 };
 
 Renderer.prototype.AddTurret = function(turretType , x , y) {
-	for (var index = 0, found = false; index < this.mBlocks.length && !found; index++) {
-		if (this.mBlocks[index].IsInsideBlock(x , y) && this.mBlocks[index].GetType() != BlockType.Dirt) {
-			var turret = new Turret(turretType , this.mBlocks[index].GetWidth() , this.mBlocks[index].GetHeight());
-			turret.SetCenterX(this.mBlocks[index].GetCenterX());
-			turret.SetCenterY(this.mBlocks[index].GetCenterY());
-			this.mTurrets[this.mTurrets.length] = turret;
-			found = true;
+	var found = false;
+	var blocks = this.mMap.GetBlocks();
+	for (var row = 0; row < blocks.length && !found; row++) {
+		for (var col = 0; col < blocks[row].length && !found; col++) {
+			if (blocks[row][col].IsInsideBlock(x , y) && blocks[row][col].GetType() != BlockType.Dirt) {
+				var turret = new Turret(turretType , blocks[row][col].GetWidth() , blocks[row][col].GetHeight());
+				turret.SetCenterX(blocks[row][col].GetCenterX());
+				turret.SetCenterY(blocks[row][col].GetCenterY());
+				this.mTurrets[this.mTurrets.length] = turret;
+				found = true;
+			}
 		}
 	}
 };

@@ -50,7 +50,7 @@ Enemy.prototype.SetMaxLife = function(life) {
 	this.mLife = life;
 }
 
-Enemy.prototype.GetStartLife = function() {
+Enemy.prototype.GetMaxLife = function() {
 	return this.mStartLife;
 }
 
