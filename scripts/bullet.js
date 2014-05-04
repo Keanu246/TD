@@ -6,8 +6,7 @@ var BulletType = {
 function Bullet(bulletType){
 
    // Add object properties like this
-   this.mDirectionX = 0.0;
-   this.mDirectionY = 0.0;
+   this.mDirectionVector = new Vector2D(0.0,0.0);
    this.mAngle = 0.0;
    this.mCenterX = 0.0;
    this.mCenterY = 0.0;
@@ -60,17 +59,24 @@ Bullet.prototype.GetCenterY = function() {
 };
 
 Bullet.prototype.GetDirectionX = function() {
-	return this.mDirectionX;
+	return this.mDirectionVector.GetX();
 };
 
 Bullet.prototype.SetDirectionX = function(speedX) {
-	this.mDirectionX = speedX;
-   if (this.mDirectionX == 0.0 && this.mDirectionY == 0.0) {
-      this.mAngle = 0.0;
-   } else {
-      this.mAngle = Math.atan2(this.mDirectionX , -1 * this.mDirectionY);
-   }
+	this.mDirectionVector.SetX(speedX);
 };
+
+Bullet.prototype.GetDirectionY = function() {
+	return this.mDirectionVector.GetY();
+};
+
+Bullet.prototype.SetDirectionY = function(speedY) {
+   this.mDirectionVector.SetY(speedY);
+};
+
+Bullet.prototype.GetDirectionVector = function() {
+   return this.mDirectionVector;
+}
 
 Bullet.prototype.GetDamage = function() {
    return this.mDamage;
@@ -84,32 +90,20 @@ Bullet.prototype.GetSpeed = function() {
    return this.mSpeed;
 };
 
-Bullet.prototype.GetDirectionY = function() {
-	return this.mDirectionY;
-};
-
-Bullet.prototype.SetDirectionY = function(speedY) {
-   this.mDirectionY = speedY;
-   if (this.mDirectionX == 0.0 && this.mDirectionY == 0.0) {
-      this.mAngle = 0.0;
-   } else {
-      this.mAngle = Math.atan2(this.mDirectionX , -1 * this.mDirectionY);
-   }
-};
 
 Bullet.prototype.Draw = function(context) {
    context.translate(this.mCenterX , this.mCenterY); 
-   context.rotate(this.mAngle);
+   context.rotate(this.mDirectionVector.GetAngle());
 	context.drawImage(this.mBitmap , -1 * this.mWidth / 2, -1 * this.mHeight / 2, this.mWidth , this.mHeight);
-   context.rotate(-1 * this.mAngle );
+   context.rotate(-1 * this.mDirectionVector.GetAngle());
    context.translate(-1 * this.mCenterX , -1 * this.mCenterY);
 };
 
 Bullet.prototype.Move = function() {
-   var distance = Math.sqrt(this.mDirectionX * this.mDirectionX + this.mDirectionY * this.mDirectionY);
-   if (distance != 0) {
-      this.mCenterX += (this.mDirectionX / distance) * this.mSpeed;
-      this.mCenterY += (this.mDirectionY / distance) * this.mSpeed;
+   var normalVector = this.mDirectionVector.GetNormalizedVector();
+   if (normalVector.GetSecondNorm() != 0) {
+      this.mCenterX += normalVector.GetX() * this.mSpeed;
+      this.mCenterY += normalVector.GetY() * this.mSpeed;
    } else {
       this.mCenterY -= this.mSpeed;
    }

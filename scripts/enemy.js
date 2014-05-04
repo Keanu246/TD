@@ -5,8 +5,7 @@ var EnemyType = {
 };
 
 function Enemy (enemyType) {
-	this.mDirectionX = 0.0;
-	this.mDirectionY = 0.0;
+	this.mDirectionVector = new Vector2D(0.0, 0.0);
 	this.mAngle = 0.0;
 	this.mCenterX = 0.0;
 	this.mCenterY = 0.0;
@@ -90,38 +89,32 @@ Enemy.prototype.GetCenterY = function() {
 };
 
 Enemy.prototype.GetDirectionX = function() {
-	return this.mDirectionX;
+	return this.mDirectionVector.GetX();
 };
 
 Enemy.prototype.SetDirectionX = function(speedX) {
-	this.mDirectionX = speedX;
-	if (this.mDirectionX == 0.0 && this.mDirectionY == 0.0) {
-	  this.mAngle = 0.0;
-	} else {
-	  this.mAngle = Math.atan2(this.mDirectionX , -1 * this.mDirectionY);
-	}
+	this.mDirectionVector.SetX(speedX);
 };
 
 Enemy.prototype.GetDirectionY = function() {
-	return this.mDirectionY;
+	return this.mDirectionVector.GetY();
 };
 
 Enemy.prototype.SetDirectionY = function(speedY) {
-   this.mDirectionY = speedY;
-   if (this.mDirectionX == 0.0 && this.mDirectionY == 0.0) {
-      this.mAngle = 0.0;
-   } else {
-      this.mAngle = Math.atan2(this.mDirectionX , -1 * this.mDirectionY);
-   }
+   this.mDirectionVector.SetY(speedY);
 };
+
+Enemy.prototype.GetDirectionVector = function() {
+	return this.mDirectionVector;
+}
 
 Enemy.prototype.Draw = function(context) {
    	context.translate(this.mCenterX , this.mCenterY); 
-   	context.rotate(this.mAngle);
+   	context.rotate(this.mDirectionVector.GetAngle());
 
 	context.drawImage(this.mBitmap , -1 * this.mWidth / 2, -1 * this.mHeight / 2, this.mWidth , this.mHeight);
    	
-   	context.rotate(-1 * this.mAngle );
+   	context.rotate(-1 * this.mDirectionVector.GetAngle());
 
    	var percent = this.mLife / this.mStartLife;
    	context.fillStyle = "green";
@@ -134,12 +127,12 @@ Enemy.prototype.Draw = function(context) {
 };
 
 Enemy.prototype.Move = function() {
-   var distance = Math.sqrt(this.mDirectionX * this.mDirectionX + this.mDirectionY * this.mDirectionY);
-   if (distance != 0) {
-	   this.mCenterX += (this.mDirectionX / distance) * this.mSpeed;
-	   this.mCenterY += (this.mDirectionY / distance) * this.mSpeed;
+   var normalVector = this.mDirectionVector.GetNormalizedVector();
+   if (normalVector.GetSecondNorm() != 0) {
+      this.mCenterX += normalVector.GetX() * this.mSpeed;
+      this.mCenterY += normalVector.GetY() * this.mSpeed;
    } else {
-   	   this.mCenterY -= this.mSpeed;
+      this.mCenterY -= this.mSpeed;
    }
 };
 

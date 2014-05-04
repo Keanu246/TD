@@ -69,16 +69,18 @@ Turret.prototype.SetFocusedEnemy = function(enemy) {
 };
 
 Turret.prototype.Draw = function(context) {
-	var angle = 0.0;
+	var directionVector = new Vector2D(0.0 , 0.0);
 	if (this.mFocusedEnemy != null) {
-		var directionX = this.mFocusedEnemy.GetCenterX() - this.mCenterX;
-		var directionY = this.mFocusedEnemy.GetCenterY() - this.mCenterY;
-		angle = Math.atan2(directionX , -1 * directionY);
+		var newBullet = new Bullet(this.mBulletType);
+		var distanceToEnemy = Math.sqrt((this.mFocusedEnemy.GetCenterX() - this.mCenterX) * (this.mFocusedEnemy.GetCenterX() - this.mCenterX)+ (this.mFocusedEnemy.GetCenterY() - this.mCenterY) * (this.mFocusedEnemy.GetCenterY() - this.mCenterY));
+		var enemyND = this.mFocusedEnemy.GetDirectionVector().GetNormalizedVector();
+		var deviation = this.mFocusedEnemy.GetSpeed() * distanceToEnemy / newBullet.GetSpeed();
+		directionVector = new Vector2D(this.mFocusedEnemy.GetCenterX() + enemyND.GetX() * deviation - this.mCenterX , this.mFocusedEnemy.GetCenterY() + enemyND.GetY() * deviation - this.mCenterY);
 	}
     context.translate(this.mCenterX , this.mCenterY); 
-    context.rotate(angle);
+    context.rotate(directionVector.GetAngle());
 	context.drawImage(this.mBitmap , -1 * this.mWidth / 2, -1 * (this.mHeight) / 2, this.mWidth , this.mHeight);
-    context.rotate(-1 * angle );
+    context.rotate(-1 * directionVector.GetAngle() );
     context.translate(-1 * this.mCenterX , -1 * this.mCenterY);
 };
 
@@ -92,25 +94,23 @@ Turret.prototype.MakeBullet = function () {
 	var distanceToEnemy = Math.sqrt((this.mFocusedEnemy.GetCenterX() - this.mCenterX) * (this.mFocusedEnemy.GetCenterX() - this.mCenterX)+ (this.mFocusedEnemy.GetCenterY() - this.mCenterY) * (this.mFocusedEnemy.GetCenterY() - this.mCenterY));
 	var distanceToFrontTurret = this.mHeight / 2;
 
+	var directionVector = new Vector2D(0.0 , 0.0);
+	if (this.mFocusedEnemy != null) {
+		var enemyND = this.mFocusedEnemy.GetDirectionVector().GetNormalizedVector();
+		var deviation = this.mFocusedEnemy.GetSpeed() * distanceToEnemy / newBullet.GetSpeed();
+		directionVector = new Vector2D(this.mFocusedEnemy.GetCenterX() + enemyND.GetX() * deviation - this.mCenterX , this.mFocusedEnemy.GetCenterY() + enemyND.GetY() * deviation - this.mCenterY).GetNormalizedVector();
+	}
 
 	if (distanceToEnemy != 0) {
-		newBullet.SetCenterX(this.mCenterX + distanceToFrontTurret * newBullet.GetDirectionX() / distanceToEnemy);
-		newBullet.SetCenterY(this.mCenterY + distanceToFrontTurret * newBullet.GetDirectionY() / distanceToEnemy);
+		newBullet.SetCenterX(this.mCenterX + distanceToFrontTurret * directionVector.GetX());
+		newBullet.SetCenterY(this.mCenterY + distanceToFrontTurret * directionVector.GetY());
 	} else {
 		newBullet.SetCenterX(this.mCenterX);
 		newBullet.SetCenterY(this.mCenterY - distanceToFrontTurret);
 	}
 
-	var enemyNX = 0.0;
-	var enemyNY = 0.0; 
-	var enemyVectSize = Math.sqrt(this.mFocusedEnemy.GetDirectionX() * this.mFocusedEnemy.GetDirectionX() + this.mFocusedEnemy.GetDirectionY() * this.mFocusedEnemy.GetDirectionY());
-	if (enemyVectSize != 0) {
-	    enemyNX = (this.mFocusedEnemy.GetDirectionX() / enemyVectSize);
-	    enemyNY = (this.mFocusedEnemy.GetDirectionY() / enemyVectSize);
-	}
-
-	newBullet.SetDirectionX(this.mFocusedEnemy.GetCenterX() + enemyNX * this.mFocusedEnemy.GetSpeed() * distanceToEnemy / newBullet.GetSpeed() - this.mCenterX);
-	newBullet.SetDirectionY(this.mFocusedEnemy.GetCenterY() + enemyNY * this.mFocusedEnemy.GetSpeed() * distanceToEnemy / newBullet.GetSpeed() - this.mCenterY);
+	newBullet.SetDirectionX(directionVector.GetX());
+	newBullet.SetDirectionY(directionVector.GetY());
 
 
 	this.mLastShotted = +new Date();
