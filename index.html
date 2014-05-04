@@ -22,8 +22,10 @@
 			var canvas = document.getElementById("drawing_canvas");
 			var renderer = new Renderer(canvas);
 			renderer.LoadMap("easy_map");
-			renderer.AddTurret(TurretType.Flaming , 500 , 500);
-			renderer.AddTurret(TurretType.Flaming , 500 , 360);
+			renderer.AddTurret(TurretType.Flaming , 560 , 240);
+			renderer.AddTurret(TurretType.Flaming , 560 , 300);
+			renderer.AddTurret(TurretType.Flaming , 560 , 360);
+			renderer.AddTurret(TurretType.Flaming , 560 , 420);
 			document.addEventListener('mousemove', function(e){ 
 	   			renderer.SetMousePos(e.clientX || e.pageX , e.clientY || e.pageY);
 			}, false);
@@ -34,7 +36,7 @@
 
 			var inter2 = setInterval(function(){
 				renderer.SpawnRandomEnemy();
-			},1000);
+			},500);
 		});
 		</script>
 	</head>

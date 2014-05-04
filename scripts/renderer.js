@@ -8,7 +8,7 @@ function Renderer(canvas) {
 	this.mBullets = [];
 	this.mTurrets = [];
 	this.mEnemies = [];
-	this.mMap = new Map();
+	this.mMap = new Map(canvas.width , canvas.height);
 }
 
 function sleep (milliseconds) {
@@ -124,7 +124,7 @@ Renderer.prototype.ManipulateObjects = function() {
 	for (var turretIndex = 0; turretIndex < this.mTurrets.length ; turretIndex++) {
 
 		var closestEnemy = null;
-		var minDistance = 100000;
+		var minDistance = 1000;
 
 		for (var enemyIndex = 0; enemyIndex < this.mEnemies.length; enemyIndex ++) {
 			var relX = this.mEnemies[enemyIndex].GetCenterX() - this.mTurrets[turretIndex].GetCenterX();
@@ -162,13 +162,12 @@ Renderer.prototype.SetMousePos = function(x , y) {
 };
 
 Renderer.prototype.LoadMap = function(mapName) {	
-	this.mMap.LoadMap("easy_map");
+	this.mMap.LoadMap(mapName);
 };
 
 Renderer.prototype.SpawnRandomEnemy = function() {
-	var enemy = new Enemy(EnemyType.Basic , 30 , 30);
+	var enemy = new Enemy(Math.floor((Math.random() * 3) + 1));
 	this.mMap.MoveObjectToStart(enemy);
-	enemy.SetMaxLife(70);
 	this.mEnemies[this.mEnemies.length] = enemy;
 }
 

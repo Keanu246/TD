@@ -1,21 +1,41 @@
 var EnemyType = {
 	Basic : 1,
+	Speeder : 2,
+	Fatty : 3,
 };
 
-function Enemy (enemyType , width , height) {
+function Enemy (enemyType) {
 	this.mDirectionX = 0.0;
 	this.mDirectionY = 0.0;
 	this.mAngle = 0.0;
 	this.mCenterX = 0.0;
 	this.mCenterY = 0.0;
-	this.mWidth = width;
-	this.mHeight = height;
 	this.mType = enemyType;
 	this.mBitmap = new Image();
 	if (enemyType == EnemyType.Basic) {
 		this.mMoney = 100;
 		this.mSpeed = 3.0;
 		this.mBitmap.src = "images/basic-enemy.png";
+		this.mStartLife = 70;
+		this.mLife = 70;
+		this.mWidth = 30;
+		this.mHeight = 30;
+	} else if (enemyType == EnemyType.Speeder) {
+		this.mMoney = 120;
+		this.mSpeed = 6.0;
+		this.mBitmap.src = "images/speeder-enemy.png";
+		this.mStartLife = 60;
+		this.mLife = 60;
+		this.mWidth = 30;
+		this.mHeight = 30;
+	} else if (enemyType == EnemyType.Fatty) {
+		this.mMoney = 130;
+		this.mSpeed = 2.3;
+		this.mBitmap.src = "images/fatty-enemy.png";
+		this.mStartLife = 100;
+		this.mLife = 100;
+		this.mWidth = 30;
+		this.mHeight = 50;
 	}
 }
 
@@ -44,15 +64,6 @@ Enemy.prototype.SetLife = function(life) {
 Enemy.prototype.GetLife = function() {
 	return this.mLife;
 };
-
-Enemy.prototype.SetMaxLife = function(life) {
-	this.mStartLife = life;
-	this.mLife = life;
-}
-
-Enemy.prototype.GetMaxLife = function() {
-	return this.mStartLife;
-}
 
 Enemy.prototype.SetSpeed = function(speed) {
 	this.mSpeed = speed;

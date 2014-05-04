@@ -1,5 +1,18 @@
-var Maps = { 
-   "easy_map":  "x0xxxxxxxxxxxxxxxxxxx\n"+
+var Maps = {
+	"easy_map": "x0xxxxxxxxxxxxxxxxxxx\n"+
+				"x1x11111111111111111x\n"+
+				"x1x1xxxxxxxxxxxxxxx1x\n"+
+				"x1x1x1111x11111111x1x\n"+
+				"x1x1x1xx1x1xxxxxx1x1x\n"+ 
+				"x1x1x1xx1x1xxxxxx1x1x\n"+
+				"x1x1x1xx1x1xxxxxx1x1x\n"+
+				"x1x1x1xx111xxxxxx1x1x\n"+
+				"x1x1x1xxxxxxxxxxx1x1x\n"+
+				"x1x1x1111111111xx1x1x\n"+
+				"x111xxxxxxxxxx1xx111x\n"+
+				"xxxxxxxxxxxxxx2xxxxxx\n",
+
+   "medium_map":"x0xxxxxxxxxxxxxxxxxxx\n"+
 		   		"x1xxxxxxxxxxxxxxxxxxx\n"+
 				"x1xxxxxxxxxxxxxxxxxxx\n"+
 				"x1xxxxxxxx1111xxxxxxx\n"+
@@ -10,16 +23,34 @@ var Maps = {
 				"x1x1xxxxxxxxx1xxxxxxx\n"+
 				"x1x1xxxxxxxxx1xxxxxxx\n"+
 				"x111xxxxxxxx11xxxxxxx\n"+
-				"xxxxxxxxxxxx2xxxxxxxx\n"
+				"xxxxxxxxxxxx2xxxxxxxx\n",
+
+	"hard_map": "x0xxxxxxx111111111112\n"+
+		   		"x1xxxxxxx1xxxxxxxxxxx\n"+
+				"x1xxxxxxx1xxxxxxxxxxx\n"+
+				"x1xxxxxxx1xxxxxxxxxxx\n"+
+				"x1xxxx1111xxxxxxxxxxx\n"+ 
+				"x1xxxx1xxxxxxxxxxxxxx\n"+
+				"x1xxxx1xxxxxxxxxxxxxx\n"+
+				"x1x1111xxxxxxxxxxxxxx\n"+
+				"x1x1xxxxxxxxxxxxxxxxx\n"+
+				"x1x1xxxxxxxxxxxxxxxxx\n"+
+				"x111xxxxxxxxxxxxxxxxx\n"+
+				"xxxxxxxxxxxxxxxxxxxxx\n",
 };
 
-function Map () {
+function Map (width , height) {
 	this.mBlocks = [];
 	this.mPathPoints = [];
 	this.mMouseX = 0;
 	this.mMouseY = 0;
 	this.mStart = null;
 	this.mFinish = null;
+	this.mBitmap = null;
+	this.mWidth = width;
+	this.mHeight = height;
+	this.mArrowImage = new Image();
+	this.mArrowImage.src = "images/arrow.png";
 }
 
 Map.prototype.SetMouseX = function(x) {
@@ -30,7 +61,8 @@ Map.prototype.SetMouseY = function(y) {
 	this.mMouseY = y;
 };
 
-Map.prototype.Draw = function(context) {
+Map.prototype.Draw = function(context) {		 
+
 	var found = false;
 	for (var blockRow = 0; blockRow < this.mBlocks.length; blockRow++) {
 		for (var blockCol = 0; blockCol < this.mBlocks[blockRow].length; blockCol++) {
@@ -41,6 +73,19 @@ Map.prototype.Draw = function(context) {
 				found = true;
 			}
 		}
+	}
+	if (this.mStart != null) {
+		var position1 = this.mStart;
+		var position2 = this.mPathPoints[0];
+		var relX = this.mBlocks[position2.GetFirst()][position2.GetSecond()].GetCenterX() - this.mBlocks[position1.GetFirst()][position1.GetSecond()].GetCenterX();
+		var relY = this.mBlocks[position2.GetFirst()][position2.GetSecond()].GetCenterY() - this.mBlocks[position1.GetFirst()][position2.GetSecond()].GetCenterY();
+		var angle = Math.atan2(relX , -1 * relY);
+		context.translate(this.mBlocks[position1.GetFirst()][position1.GetSecond()].GetCenterX() , this.mBlocks[position1.GetFirst()][position1.GetSecond()].GetCenterY());
+		context.rotate(angle);
+		context.drawImage(this.mArrowImage , -20 , -20 , 40 , 40);
+		context.rotate(-1* angle);
+		context.translate(-1 * this.mBlocks[position1.GetFirst()][position1.GetSecond()].GetCenterX() , -1 * this.mBlocks[position1.GetFirst()][position1.GetSecond()].GetCenterY());
+		
 	}
 };
 
@@ -74,7 +119,7 @@ Map.prototype.LoadMap = function(mapName) {
 				var block = new Block(BlockType.Road , 60 , 60);
 			}
 			block.SetCenterX(col * 60);
-			block.SetCenterY(row * 60);
+			block.SetCenterY(row * 60 + 30);
 			tempBlocks[row][col] = block;
 			selectMatrix[row][col] = false;
 			col++;
@@ -109,7 +154,9 @@ Map.prototype.LoadMap = function(mapName) {
 	this.mFinish = finish;
 	this.mStart = start;
 	this.mPathPoints = pathPoints;
+
 	console.log("Map : " + mapName + " loaded!");
+
 };
 
 Map.prototype.MoveObjectToStart = function(object) {

@@ -88,18 +88,30 @@ Turret.prototype.MakeBullet = function () {
 		return null;
 	}
 	var newBullet = new Bullet(this.mBulletType);
-	newBullet.SetDirectionX(this.mFocusedEnemy.GetCenterX() - this.mCenterX);
-	newBullet.SetDirectionY(this.mFocusedEnemy.GetCenterY() - this.mCenterY);
 
-	vectorNorm = Math.sqrt(newBullet.GetDirectionX() * newBullet.GetDirectionX() + newBullet.GetDirectionY() * newBullet.GetDirectionY());
-	distance = this.mHeight / 2;
-	if (vectorNorm != 0) {
-		newBullet.SetCenterX(this.mCenterX + distance * newBullet.GetDirectionX() / vectorNorm);
-		newBullet.SetCenterY(this.mCenterY + distance * newBullet.GetDirectionY() / vectorNorm);
+	var distanceToEnemy = Math.sqrt((this.mFocusedEnemy.GetCenterX() - this.mCenterX) * (this.mFocusedEnemy.GetCenterX() - this.mCenterX)+ (this.mFocusedEnemy.GetCenterY() - this.mCenterY) * (this.mFocusedEnemy.GetCenterY() - this.mCenterY));
+	var distanceToFrontTurret = this.mHeight / 2;
+
+
+	if (distanceToEnemy != 0) {
+		newBullet.SetCenterX(this.mCenterX + distanceToFrontTurret * newBullet.GetDirectionX() / distanceToEnemy);
+		newBullet.SetCenterY(this.mCenterY + distanceToFrontTurret * newBullet.GetDirectionY() / distanceToEnemy);
 	} else {
 		newBullet.SetCenterX(this.mCenterX);
-		newBullet.SetCenterY(this.mCenterY - distance);
+		newBullet.SetCenterY(this.mCenterY - distanceToFrontTurret);
 	}
+
+	var enemyNX = 0.0;
+	var enemyNY = 0.0; 
+	var enemyVectSize = Math.sqrt(this.mFocusedEnemy.GetDirectionX() * this.mFocusedEnemy.GetDirectionX() + this.mFocusedEnemy.GetDirectionY() * this.mFocusedEnemy.GetDirectionY());
+	if (enemyVectSize != 0) {
+	    enemyNX = (this.mFocusedEnemy.GetDirectionX() / enemyVectSize);
+	    enemyNY = (this.mFocusedEnemy.GetDirectionY() / enemyVectSize);
+	}
+
+	newBullet.SetDirectionX(this.mFocusedEnemy.GetCenterX() + enemyNX * this.mFocusedEnemy.GetSpeed() * distanceToEnemy / newBullet.GetSpeed() - this.mCenterX);
+	newBullet.SetDirectionY(this.mFocusedEnemy.GetCenterY() + enemyNY * this.mFocusedEnemy.GetSpeed() * distanceToEnemy / newBullet.GetSpeed() - this.mCenterY);
+
 
 	this.mLastShotted = +new Date();
 
