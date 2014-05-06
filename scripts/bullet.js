@@ -7,7 +7,6 @@ function Bullet(bulletType){
 
    // Add object properties like this
    this.mDirectionVector = new Vector2D(0.0,0.0);
-   this.mAngle = 0.0;
    this.mCenterX = 0.0;
    this.mCenterY = 0.0;
    this.mType = bulletType;
@@ -25,6 +24,8 @@ function Bullet(bulletType){
       this.mSpeed = 10.0;
       this.mDamage = 2;
    }
+   this.mDistanceTravelled = 0.0;
+   this.mMaxDistance = 0.0;
 }
 
 
@@ -90,6 +91,18 @@ Bullet.prototype.GetSpeed = function() {
    return this.mSpeed;
 };
 
+Bullet.prototype.GetMaxDistance = function() {
+   return this.mMaxDistance;
+}
+
+Bullet.prototype.SetMaxDistance = function(distance) {
+   this.mMaxDistance = distance;
+}
+
+Bullet.prototype.GetDistanceTravelled = function() {
+   return this.mDistanceTravelled;
+}
+
 
 Bullet.prototype.Draw = function(context) {
    context.translate(this.mCenterX , this.mCenterY); 
@@ -107,6 +120,7 @@ Bullet.prototype.Move = function() {
    } else {
       this.mCenterY -= this.mSpeed;
    }
+   this.mDistanceTravelled += this.mSpeed;
 };
 
 Bullet.prototype.CheckCollision = function(object) {
@@ -119,4 +133,3 @@ Bullet.prototype.CheckCollision = function(object) {
       return true;
    }
 };
-

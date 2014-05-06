@@ -112,6 +112,8 @@ Turret.prototype.MakeBullet = function () {
 	newBullet.SetDirectionX(directionVector.GetX());
 	newBullet.SetDirectionY(directionVector.GetY());
 
+	newBullet.SetMaxDistance(this.mRange);
+
 
 	this.mLastShotted = +new Date();
 

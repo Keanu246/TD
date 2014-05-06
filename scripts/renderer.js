@@ -78,6 +78,12 @@ Renderer.prototype.ManipulateObjects = function() {
 			outside ++;
 			bulletIndex --;
 			// Swap with the last for fast removal;
+		} else if (this.mBullets[bulletIndex].GetDistanceTravelled() > this.mBullets[bulletIndex].GetMaxDistance()) {
+
+			this.mBullets.Swap(bulletIndex , this.mBullets.length - outside - 1);
+			outside ++;
+			bulletIndex --;
+
 		} else {
 			// If the bullet is not outside , then we check collision with bullets
 			for (var enemyIndex = 0; enemyIndex < this.mEnemies.length; enemyIndex ++) {
@@ -98,7 +104,8 @@ Renderer.prototype.ManipulateObjects = function() {
 	}
 
 	this.mBullets = this.mBullets.slice(0 , this.mBullets.length - outside);
-	// Remove the bullets that go outside or make collision with an enemy
+	// Remove the bullets that go outside or make collision with an enemy or travel more than
+	// the max distance
 
 	for (var bulletIndex = 0; bulletIndex < this.mBullets.length ; bulletIndex++) {
 		this.mBullets[bulletIndex].Move();

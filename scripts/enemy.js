@@ -6,7 +6,6 @@ var EnemyType = {
 
 function Enemy (enemyType) {
 	this.mDirectionVector = new Vector2D(0.0, 0.0);
-	this.mAngle = 0.0;
 	this.mCenterX = 0.0;
 	this.mCenterY = 0.0;
 	this.mType = enemyType;
@@ -29,10 +28,10 @@ function Enemy (enemyType) {
 		this.mHeight = 30;
 	} else if (enemyType == EnemyType.Fatty) {
 		this.mMoney = 130;
-		this.mSpeed = 2.3;
+		this.mSpeed = 2.0;
 		this.mBitmap.src = "images/fatty-enemy.png";
-		this.mStartLife = 100;
-		this.mLife = 100;
+		this.mStartLife = 160;
+		this.mLife = 160;
 		this.mWidth = 30;
 		this.mHeight = 50;
 	}
