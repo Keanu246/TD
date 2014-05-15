@@ -1,4 +1,5 @@
 var MAX_MILLISECONDS = 20;
+var MAX_ENEMIES = 10;
 var frames  = 0;
 var lastTime = +new Date();
 
@@ -9,6 +10,16 @@ function Renderer(canvas) {
 	this.mTurrets = [];
 	this.mEnemies = [];
 	this.mMap = new Map(canvas.width , canvas.height);
+	this.mMoney = 0;
+	var that = this;
+	this.mRenderInterval = setInterval(function(){
+		that.RenderAll();
+	} , 10);
+
+	this.mSpawnInterval = setInterval(function(){
+		that.SpawnRandomEnemy();
+	},500);
+
 }
 
 function sleep (milliseconds) {
@@ -37,6 +48,19 @@ Renderer.prototype.RenderAll = function() {
 
 }
 
+Renderer.prototype.Restart = function() {
+	this.mBullets = [];
+	this.mTurrets = [];
+	this.mEnemies = [];
+	this.mMoney = 0;
+	var that = this;
+
+	this.mSpawnInterval = setInterval(function(){
+		that.SpawnRandomEnemy();
+	},500);
+	$(".canvas_class .restart_class").css("visibility" , "hidden");
+}
+
 Renderer.prototype.Draw = function() {
 
 	this.mContext.save();
@@ -57,6 +81,12 @@ Renderer.prototype.Draw = function() {
 			found = true;
 		}
 	}
+
+	this.mContext.font = "20px Helvetica";
+	this.mContext.fillStyle = "white";
+	this.mContext.fillText("Enemies on map : " + this.mEnemies.length , this.mCanvas.width - 300 , 30);
+	this.mContext.fillText("You lose when > " + MAX_ENEMIES + " enemies" , this.mCanvas.width - 300 , 50);
+	this.mContext.fillText("Money : " + this.mMoney , this.mCanvas.width - 300 , 70);
 
 	this.mContext.restore();
 };
@@ -94,6 +124,7 @@ Renderer.prototype.ManipulateObjects = function() {
 					bulletIndex --;
 
 					if (this.mEnemies[enemyIndex].GetLife() <= 0) {
+						this.mMoney += this.mEnemies[enemyIndex].GetMoney();
 						this.mEnemies.Swap(enemyIndex , this.mEnemies.length - 1);
 						this.mEnemies = this.mEnemies.slice(0 , this.mEnemies.length - 1);
 					}
@@ -116,13 +147,16 @@ Renderer.prototype.ManipulateObjects = function() {
 		this.mMap.KeepObjectOnPath(this.mEnemies[enemyIndex]);
 
 		if (!(this.mEnemies[enemyIndex].GetCenterX() >= 0 && this.mEnemies[enemyIndex].GetCenterX() < this.mCanvas.width && this.mEnemies[enemyIndex].GetCenterY() >= 0 && this.mEnemies[enemyIndex].GetCenterY() < this.mCanvas.height)){
-			this.mEnemies.Swap(enemyIndex , this.mEnemies.length - outside - 1);
-			outside ++;
-			enemyIndex --;
+			this.mMap.MoveObjectToStart(this.mEnemies[enemyIndex]);
 		}
 	}
 
-	this.mEnemies = this.mEnemies.slice(0 , this.mEnemies.length - outside);
+	if (this.mEnemies.length > MAX_ENEMIES) {
+		$(".canvas_class .restart_class").css("visibility" , "visible");
+		this.mTurrets = [];
+		this.mBullets = [];
+		clearInterval(this.mSpawnInterval);
+	}
 
 	for (var enemyIndex = 0; enemyIndex < this.mEnemies.length ; enemyIndex++) {
 		this.mEnemies[enemyIndex].Move();

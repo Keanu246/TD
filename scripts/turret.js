@@ -74,7 +74,7 @@ Turret.prototype.Draw = function(context) {
 		var newBullet = new Bullet(this.mBulletType);
 		var distanceToEnemy = Math.sqrt((this.mFocusedEnemy.GetCenterX() - this.mCenterX) * (this.mFocusedEnemy.GetCenterX() - this.mCenterX)+ (this.mFocusedEnemy.GetCenterY() - this.mCenterY) * (this.mFocusedEnemy.GetCenterY() - this.mCenterY));
 		var enemyND = this.mFocusedEnemy.GetDirectionVector().GetNormalizedVector();
-		var deviation = this.mFocusedEnemy.GetSpeed() * distanceToEnemy / newBullet.GetSpeed();
+		var deviation = (this.mFocusedEnemy.GetSpeed() * distanceToEnemy) / (newBullet.GetSpeed() * 1.5);
 		directionVector = new Vector2D(this.mFocusedEnemy.GetCenterX() + enemyND.GetX() * deviation - this.mCenterX , this.mFocusedEnemy.GetCenterY() + enemyND.GetY() * deviation - this.mCenterY);
 	}
     context.translate(this.mCenterX , this.mCenterY); 
@@ -97,7 +97,7 @@ Turret.prototype.MakeBullet = function () {
 	var directionVector = new Vector2D(0.0 , 0.0);
 	if (this.mFocusedEnemy != null) {
 		var enemyND = this.mFocusedEnemy.GetDirectionVector().GetNormalizedVector();
-		var deviation = this.mFocusedEnemy.GetSpeed() * distanceToEnemy / newBullet.GetSpeed();
+		var deviation = (this.mFocusedEnemy.GetSpeed() * distanceToEnemy) / (newBullet.GetSpeed() * 1.5);
 		directionVector = new Vector2D(this.mFocusedEnemy.GetCenterX() + enemyND.GetX() * deviation - this.mCenterX , this.mFocusedEnemy.GetCenterY() + enemyND.GetY() * deviation - this.mCenterY).GetNormalizedVector();
 	}
 
