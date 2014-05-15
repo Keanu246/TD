@@ -1,5 +1,5 @@
 var MAX_MILLISECONDS = 20;
-var MAX_ENEMIES = 10;
+var MAX_ENEMIES = 130;
 var frames  = 0;
 var lastTime = +new Date();
 
@@ -10,7 +10,7 @@ function Renderer(canvas) {
 	this.mTurrets = [];
 	this.mEnemies = [];
 	this.mMap = new Map(canvas.width , canvas.height);
-	this.mMoney = 0;
+	this.mMoney = 10000;
 	var that = this;
 	this.mRenderInterval = setInterval(function(){
 		that.RenderAll();
@@ -19,6 +19,9 @@ function Renderer(canvas) {
 	this.mSpawnInterval = setInterval(function(){
 		that.SpawnRandomEnemy();
 	},500);
+
+	this.mMovingObject = null;
+	this.mDrawMovingObject = false;
 
 }
 
@@ -52,7 +55,7 @@ Renderer.prototype.Restart = function() {
 	this.mBullets = [];
 	this.mTurrets = [];
 	this.mEnemies = [];
-	this.mMoney = 0;
+	this.mMoney = 10000;
 	var that = this;
 
 	this.mSpawnInterval = setInterval(function(){
@@ -82,11 +85,15 @@ Renderer.prototype.Draw = function() {
 		}
 	}
 
+	if (this.mDrawMovingObject) {
+		this.mMovingObject.Draw(this.mContext);
+	}
+
 	this.mContext.font = "20px Helvetica";
-	this.mContext.fillStyle = "white";
-	this.mContext.fillText("Enemies on map : " + this.mEnemies.length , this.mCanvas.width - 300 , 30);
-	this.mContext.fillText("You lose when > " + MAX_ENEMIES + " enemies" , this.mCanvas.width - 300 , 50);
-	this.mContext.fillText("Money : " + this.mMoney , this.mCanvas.width - 300 , 70);
+	this.mContext.fillStyle = "blue";
+	this.mContext.fillText("Enemies on map : " + this.mEnemies.length , this.mCanvas.width - 300 , this.mCanvas.height - 70);
+	this.mContext.fillText("You lose when > " + MAX_ENEMIES + " enemies" , this.mCanvas.width - 300 , this.mCanvas.height - 50);
+	this.mContext.fillText("Money : " + this.mMoney , this.mCanvas.width - 300 , this.mCanvas.height - 30);
 
 	this.mContext.restore();
 };
@@ -98,6 +105,11 @@ Array.prototype.Swap = function (pos1 , pos2) {
 };
 
 Renderer.prototype.ManipulateObjects = function() {
+
+	if (this.mMovingObject != null) {
+		this.mMovingObject.SetCenterX(this.mMouseX);
+		this.mMovingObject.SetCenterY(this.mMouseY);
+	}
 
 	var outside = 0;
 	for (var bulletIndex = 0; bulletIndex < this.mBullets.length - outside; bulletIndex++) {
@@ -156,6 +168,7 @@ Renderer.prototype.ManipulateObjects = function() {
 		this.mTurrets = [];
 		this.mBullets = [];
 		clearInterval(this.mSpawnInterval);
+		this.mMoney = 0;
 	}
 
 	for (var enemyIndex = 0; enemyIndex < this.mEnemies.length ; enemyIndex++) {
@@ -212,19 +225,40 @@ Renderer.prototype.SpawnRandomEnemy = function() {
 	this.mEnemies[this.mEnemies.length] = enemy;
 }
 
+Renderer.prototype.SetMovingObject = function(turretType) {
+	this.mMovingObject = new Turret(turretType , 60 , 60);
+}
+
+Renderer.prototype.SetDrawMovingObject = function(value) {
+	this.mDrawMovingObject = value;
+}
+
+Renderer.prototype.GetDrawMovingObject = function() {
+	return this.mDrawMovingObject;
+}
+
+Renderer.prototype.GetMovingObject = function() {
+	return this.mMovingObject;
+}
+
 Renderer.prototype.AddTurret = function(turretType , x , y) {
 	var found = false;
 	var blocks = this.mMap.GetBlocks();
+	var turret = new Turret(turretType , 60 , 60);
+	if (turret.GetCost() > this.mMoney) {
+		return false
+	}
 	for (var row = 0; row < blocks.length && !found; row++) {
 		for (var col = 0; col < blocks[row].length && !found; col++) {
 			if (blocks[row][col].IsInsideBlock(x , y) && blocks[row][col].GetType() != BlockType.Dirt) {
-				var turret = new Turret(turretType , blocks[row][col].GetWidth() , blocks[row][col].GetHeight());
 				turret.SetCenterX(blocks[row][col].GetCenterX());
 				turret.SetCenterY(blocks[row][col].GetCenterY());
 				this.mTurrets[this.mTurrets.length] = turret;
+				this.mMoney -= turret.GetCost()
 				found = true;
 			}
 		}
 	}
+	return found
 };
 

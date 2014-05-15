@@ -22,6 +22,26 @@
 			document.addEventListener('mousemove', function(e){ 
 	   			renderer.SetMousePos(e.clientX || e.pageX , e.clientY || e.pageY);
 			}, false);
+			$(canvas).click(function(){
+				if (renderer.GetDrawMovingObject()) {
+					var turret = renderer.GetMovingObject()
+					var result = renderer.AddTurret(turret.GetType() , turret.GetCenterX() , turret.GetCenterY());
+					if (result) {
+						renderer.SetDrawMovingObject(false);
+					}
+				}
+			});
+
+			$(".canvas_class .shop_class div").click(function() {
+				var turretType = $($(this).find("p")[0]).text();
+				if (turretType == "Flaming") {
+					turretType = TurretType.Flaming;
+				} else if (turretType == "Basic") {
+					turretType = TurretType.Basic;
+				}
+				renderer.SetMovingObject(turretType);
+				renderer.SetDrawMovingObject(true);
+			});
 		});
 		</script>
 	</head>
@@ -40,11 +60,29 @@
 					<button onclick = "renderer.Restart()">
 						Yes
 					</button>
-					<button onclick = "$(".canvas_class .restart_class").css("visibility" , "hidden")">
+					<button>
 						No
 					</button>
 				</div>
 			</div>
+			
+			<div class = "shop_class">
+				<p>
+					Shop
+				</p>
+
+				<div>
+					<p>Basic</p>
+					<img src="images/basic-turret.png">
+				</div>
+
+				<div>
+					<p>Flaming</p>
+					<img src="images/flaming-turret.png">
+				</div>
+
+			</div>
+
 		</div>
 	</body>
 </html>

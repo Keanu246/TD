@@ -17,16 +17,22 @@ function Turret (turretType , width , height) {
    		this.mBitmap.src = "images/basic-turret.png";
    		this.mRange = 200;
    		this.mAtckSpeed = 300; //milliseconds
+   		this.mCost = 1000;
    	} else if (turretType == TurretType.Flaming) {
    		this.mBulletType =	BulletType.Fire;
    		this.mRange = 130;
    		this.mAtckSpeed = 30;
-   		this.mBitmap.src = "images/basic-turret.png";
+   		this.mBitmap.src = "images/flaming-turret.png";
+   		this.mCost = 5000;
    	}
    	this.mLastShotted = 0;
 }
 
 Turret.prototype.Constructor = Turret;
+
+Turret.prototype.GetCost = function() {
+	return this.mCost;
+}
 
 Turret.prototype.GetRange = function() {
 	return this.mRange;
