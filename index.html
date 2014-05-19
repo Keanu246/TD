@@ -1,1 +1,88 @@
-My GitHub Page
+<html>
+	<head>
+		<title>
+			TD
+		</title>
+		<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
+		<script type="text/javascript" src="scripts/bullet.js"></script>
+		<script type="text/javascript" src="scripts/renderer.js"></script>
+		<script type="text/javascript" src="scripts/block.js"></script>
+		<script type="text/javascript" src="scripts/maps.js"></script>
+		<script type="text/javascript" src="scripts/turret.js"></script>
+		<script type="text/javascript" src="scripts/enemy.js"></script>
+		<script type="text/javascript" src="scripts/pair.js"></script>
+		<script type="text/javascript" src="scripts/vector2D.js"></script>
+		<link rel="stylesheet" type="text/css" href="styles/main_style.css">
+		<script>
+
+		$(function(){
+			var canvas = $(".canvas_class canvas")[0];
+			renderer = new Renderer(canvas);
+			renderer.LoadMap("easy_map");
+			document.addEventListener('mousemove', function(e){ 
+	   			renderer.SetMousePos(e.clientX || e.pageX , e.clientY || e.pageY);
+			}, false);
+			$(canvas).click(function(){
+				if (renderer.GetDrawMovingObject()) {
+					var turret = renderer.GetMovingObject()
+					var result = renderer.AddTurret(turret.GetType() , turret.GetCenterX() , turret.GetCenterY());
+					if (result) {
+						renderer.SetDrawMovingObject(false);
+					}
+				}
+			});
+
+			$(".canvas_class .shop_class div").click(function() {
+				var turretType = $($(this).find("p")[0]).text();
+				if (turretType == "Flaming") {
+					turretType = TurretType.Flaming;
+				} else if (turretType == "Basic") {
+					turretType = TurretType.Basic;
+				}
+				renderer.SetMovingObject(turretType);
+				renderer.SetDrawMovingObject(true);
+			});
+		});
+		</script>
+	</head>
+	<body>
+		<div class = "canvas_class">
+			<canvas width = 1200 height = 662>			
+			</canvas>
+			<div class = "restart_class">
+				<p>
+					You have lost.
+				</p>
+				<p>
+					Restart?
+				</p>
+				<div>
+					<button onclick = "renderer.Restart()">
+						Yes
+					</button>
+					<button>
+						No
+					</button>
+				</div>
+			</div>
+			
+			<div class = "shop_class">
+				<p>
+					Shop
+				</p>
+
+				<div>
+					<p>Basic</p>
+					<img src="images/basic-turret.png">
+				</div>
+
+				<div>
+					<p>Flaming</p>
+					<img src="images/flaming-turret.png">
+				</div>
+
+			</div>
+
+		</div>
+	</body>
+</html>
