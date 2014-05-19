@@ -19,9 +19,26 @@
 			var canvas = $(".canvas_class canvas")[0];
 			renderer = new Renderer(canvas);
 			renderer.LoadMap("easy_map");
-			document.addEventListener('mousemove', function(e){ 
-	   			renderer.SetMousePos(e.clientX || e.pageX , e.clientY || e.pageY);
-			}, false);
+			$(document).mousemove(function(event){
+				var height = $(".canvas_class .shop_class").height();
+				var mouseX = event.clientX || event.pageX;
+				var mouseY = event.clientY || event.pageY;
+				if (!renderer.GetDrawMovingObject()) {
+					if (mouseY <= height) {
+						$(".canvas_class .shop_class").show();
+					} else {
+						$(".canvas_class .shop_class").hide();
+					}
+				}
+	   			renderer.SetMousePos(mouseX , mouseY);
+			});
+
+			$(document).keyup(function(event) {
+				if (event.keyCode == 27) {
+					renderer.SetDrawMovingObject(false);
+				}
+			});
+
 			$(canvas).click(function(){
 				if (renderer.GetDrawMovingObject()) {
 					var turret = renderer.GetMovingObject()
@@ -41,6 +58,7 @@
 				}
 				renderer.SetMovingObject(turretType);
 				renderer.SetDrawMovingObject(true);
+				$(".canvas_class .shop_class").hide();
 			});
 		});
 		</script>
