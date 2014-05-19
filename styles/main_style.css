@@ -57,7 +57,7 @@
 	left: 0px;
 	position: absolute;
 	padding: 2px 0px 2px 0px;
-	opacity: 0;
+	display: none;
 }
 
 .canvas_class .shop_class > p {
@@ -91,9 +91,5 @@
 	font-size: 10px;
 	width: 100%;
 	text-align: center;
-}
-
-.canvas_class .shop_class:hover {
-	opacity: 100;
 }
 

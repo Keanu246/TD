@@ -77,6 +77,10 @@ Renderer.prototype.Draw = function() {
 	for (var index = 0; index < this.mEnemies.length ; index++) {
 		this.mEnemies[index].Draw(this.mContext);
 	}
+	if (this.mDrawMovingObject) {
+		this.mMovingObject.Draw(this.mContext);
+	}
+	
 	for (var index = 0, found = false; index < this.mTurrets.length ; index++) {
 		this.mTurrets[index].Draw(this.mContext);
 		if (!found && this.mTurrets[index].IsInsideTurret(this.mMouseX , this.mMouseY)) {
@@ -85,9 +89,6 @@ Renderer.prototype.Draw = function() {
 		}
 	}
 
-	if (this.mDrawMovingObject) {
-		this.mMovingObject.Draw(this.mContext);
-	}
 
 	this.mContext.font = "20px Helvetica";
 	this.mContext.fillStyle = "blue";
