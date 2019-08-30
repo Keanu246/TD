@@ -1,4 +1,4 @@
-Javascript-Tower-Defence
+Tower Defense
 ========================
 
-A tower defence javascript game. Run index.html , and play.
+A tower defense game. With enemies, towers and more.
